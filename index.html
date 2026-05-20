@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>★ PIXEL AGENTS ★</title>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:    #080510;
+      --bg2:   #0e0a1a;
+      --bg3:   #130d22;
+      --border:#2a1f4a;
+      --text:  #e8d5ff;
+      --dim:   #5a4a7a;
+
+      --reviewer:   #00ff9d;
+      --resolver:   #ff6b35;
+      --architect:  #4fc3f7;
+      --planner:    #ce93d8;
+      --tester:     #fff176;
+      --optimizer:  #ff4081;
+      --analyzer:   #40c4ff;
+      --operator:   #69f0ae;
+      --opensource: #ffab40;
+      --gan:        #e040fb;
+      --network:    #00e5ff;
+      --security:   #ff1744;
+      --docs:       #b2ff59;
+      --healthcare: #f48fb1;
+      --specialized:#ff6e40;
+
+      --opus:   #ffd700;
+      --sonnet: #00e5ff;
+      --haiku:  #ff4fff;
+    }
+
+    * { margin:0; padding:0; box-sizing:border-box; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Press Start 2P', monospace;
+      font-size: 10px;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Pixel grid background */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+      background-size: 16px 16px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* CRT scanlines */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 3px,
+        rgba(0,0,0,0.12) 3px,
+        rgba(0,0,0,0.12) 4px
+      );
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    /* Stars */
+    .star {
+      position: fixed;
+      width: 2px;
+      height: 2px;
+      background: #fff;
+      pointer-events: none;
+      z-index: 0;
+      animation: twinkle var(--d, 3s) var(--delay, 0s) infinite;
+    }
+    @keyframes twinkle {
+      0%,100% { opacity:.1; }
+      50%      { opacity:.8; }
+    }
+
+    /* ── Sticky wrapper ── */
+    #sticky {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--bg);
+      border-bottom: 2px solid var(--border);
+    }
+
+    /* ── Header ── */
+    #header {
+      padding: 20px 32px 14px;
+    }
+
+    .title-row {
+      display: flex;
+      align-items: baseline;
+      gap: 16px;
+      margin-bottom: 6px;
+      flex-wrap: wrap;
+    }
+
+    .pixel-title {
+      font-size: 20px;
+      letter-spacing: 3px;
+      background: linear-gradient(90deg, #ff4fff 0%, #00e5ff 50%, #ff4fff 100%);
+      background-size: 200%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: shimmer 4s linear infinite;
+    }
+    @keyframes shimmer {
+      0%   { background-position: 0%   50%; }
+      100% { background-position: 200% 50%; }
+    }
+
+    .cursor {
+      display: inline-block;
+      width: 10px; height: 18px;
+      background: var(--sonnet);
+      animation: blink 1s step-end infinite;
+      vertical-align: middle;
+      margin-left: 2px;
+    }
+    @keyframes blink { 50% { opacity: 0; } }
+
+    .stats-bar {
+      display: flex;
+      gap: 20px;
+      font-size: 7px;
+      color: var(--dim);
+      flex-wrap: wrap;
+    }
+    .stats-bar b { color: var(--sonnet); }
+
+    /* ── Controls ── */
+    #controls {
+      padding: 10px 32px 12px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      border-top: 1px solid var(--border);
+    }
+
+    .search-wrap {
+      position: relative;
+      flex: 0 0 240px;
+    }
+    .search-icon {
+      position: absolute;
+      left: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--dim);
+      font-size: 12px;
+      pointer-events: none;
+    }
+    #search {
+      width: 100%;
+      background: var(--bg2);
+      border: 2px solid var(--border);
+      color: var(--text);
+      font-family: 'Press Start 2P', monospace;
+      font-size: 8px;
+      padding: 7px 8px 7px 26px;
+      outline: none;
+      transition: border-color .2s;
+    }
+    #search:focus {
+      border-color: var(--sonnet);
+      box-shadow: 0 0 8px rgba(0,229,255,.2);
+    }
+    #search::placeholder { color: var(--dim); }
+
+    .filter-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+    }
+
+    .filter-btn {
+      background: var(--bg2);
+      border: 1px solid currentColor;
+      color: var(--dim);
+      font-family: 'Press Start 2P', monospace;
+      font-size: 5px;
+      padding: 4px 7px;
+      cursor: pointer;
+      transition: all .12s;
+      letter-spacing: .5px;
+      opacity: .7;
+    }
+    .filter-btn:hover { opacity: 1; color: var(--text); border-color: var(--text); }
+    .filter-btn.active {
+      background: var(--active-col, var(--sonnet));
+      border-color: var(--active-col, var(--sonnet));
+      color: #080510;
+      opacity: 1;
+    }
+    .filter-btn .cnt {
+      opacity: .7;
+      margin-left: 3px;
+    }
+
+    /* ── Grid ── */
+    #grid {
+      position: relative;
+      z-index: 1;
+      padding: 24px 32px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(272px, 1fr));
+      gap: 14px;
+    }
+
+    /* ── Card ── */
+    .agent-card {
+      background: var(--bg2);
+      border: 2px solid var(--cc, var(--border));
+      position: relative;
+      overflow: hidden;
+      animation: fadeUp .3s ease forwards;
+      opacity: 0;
+      transition: transform .1s, box-shadow .2s;
+    }
+    .agent-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 28px rgba(0,0,0,.6),
+                  0 0 20px color-mix(in srgb, var(--cc) 25%, transparent);
+    }
+
+    @keyframes fadeUp {
+      from { opacity:0; transform: translateY(8px); }
+      to   { opacity:1; transform: translateY(0); }
+    }
+
+    /* Pixel corner accents */
+    .agent-card::before,
+    .agent-card::after {
+      content: '';
+      position: absolute;
+      width: 6px; height: 6px;
+      background: var(--cc, var(--border));
+    }
+    .agent-card::before { top:0; right:0; }
+    .agent-card::after  { bottom:0; left:0; }
+
+    /* Inner corner top-left */
+    .corner-tl, .corner-br {
+      position: absolute;
+      width: 6px; height: 6px;
+      background: var(--cc, var(--border));
+      z-index: 2;
+    }
+    .corner-tl { top:0;    left:0; }
+    .corner-br { bottom:0; right:0; }
+
+    .card-top {
+      padding: 16px 14px 12px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .sprite-wrap {
+      flex-shrink: 0;
+      width: 44px; height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .sprite-wrap svg {
+      image-rendering: pixelated;
+      animation: glow 2.5s ease-in-out infinite;
+    }
+    @keyframes glow {
+      0%,100% { filter: drop-shadow(0 0 3px var(--cc)); }
+      50%      { filter: drop-shadow(0 0 10px var(--cc)) drop-shadow(0 0 20px var(--cc)); }
+    }
+
+    .card-meta { flex: 1; min-width: 0; }
+
+    .agent-name {
+      font-size: 7.5px;
+      color: var(--cc, var(--text));
+      line-height: 1.6;
+      word-break: break-word;
+      margin-bottom: 7px;
+      letter-spacing: .5px;
+    }
+
+    .badge-row { display: flex; gap: 4px; flex-wrap: wrap; }
+
+    .badge {
+      font-size: 5px;
+      padding: 2px 5px;
+      letter-spacing: .8px;
+      font-family: 'Press Start 2P', monospace;
+      white-space: nowrap;
+    }
+    .badge-model { border: 1px solid; }
+    .badge-model.opus   { color: var(--opus);   border-color: var(--opus); }
+    .badge-model.sonnet { color: var(--sonnet); border-color: var(--sonnet); }
+    .badge-model.haiku  { color: var(--haiku);  border-color: var(--haiku); }
+    .badge-cat { background: var(--cc); color: #080510; }
+
+    .card-desc {
+      padding: 9px 14px;
+      font-size: 5.5px;
+      color: var(--dim);
+      line-height: 2;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      border-bottom: 1px solid var(--border);
+      min-height: 52px;
+    }
+
+    .card-tools {
+      padding: 7px 14px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 3px;
+    }
+    .tool-tag {
+      font-size: 4.5px;
+      padding: 2px 4px;
+      background: rgba(255,255,255,.03);
+      border: 1px solid var(--border);
+      color: var(--dim);
+      letter-spacing: .3px;
+    }
+
+    /* No results */
+    .no-results {
+      display: none;
+      grid-column: 1/-1;
+      text-align: center;
+      padding: 80px 20px;
+      color: var(--dim);
+      line-height: 3;
+    }
+    .no-results.show { display: block; }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border); }
+    ::-webkit-scrollbar-thumb:hover { background: var(--dim); }
+  </style>
+</head>
+<body>
+
+<div id="sticky">
+  <div id="header">
+    <div class="title-row">
+      <span class="pixel-title">★ PIXEL AGENTS ★</span><span class="cursor"></span>
+    </div>
+    <div class="stats-bar">
+      <span>AGENTS: <b id="total-count">0</b></span>
+      <span>VISIBLE: <b id="show-count">0</b></span>
+      <span>OPUS: <b id="opus-count" style="color:var(--opus)">0</b></span>
+      <span>SONNET: <b id="sonnet-count" style="color:var(--sonnet)">0</b></span>
+      <span>HAIKU: <b id="haiku-count" style="color:var(--haiku)">0</b></span>
+    </div>
+  </div>
+  <div id="controls">
+    <div class="search-wrap">
+      <span class="search-icon">⌕</span>
+      <input type="text" id="search" placeholder="SEARCH...">
+    </div>
+    <div class="filter-group" id="filters"></div>
+  </div>
+</div>
+
+<div id="grid">
+  <div class="no-results" id="no-results">
+    &gt; NO AGENTS FOUND<br>
+    <span style="font-size:7px">TRY DIFFERENT KEYWORDS</span>
+  </div>
+</div>
+
+<script>
+// ── Pixel sprites (8×8 binary rows) ────────────────────────────────────────
+const SPRITES = {
+  reviewer: [
+    '00111000',
+    '01000100',
+    '01000100',
+    '00111100',
+    '00011110',
+    '00001111',
+    '00000110',
+    '00000000',
+  ],
+  resolver: [
+    '11000010',
+    '01100110',
+    '00111100',
+    '00011000',
+    '00111000',
+    '01110000',
+    '11100000',
+    '00000000',
+  ],
+  architect: [
+    '00011000',
+    '00111100',
+    '01011010',
+    '10011001',
+    '11111111',
+    '10011001',
+    '10011001',
+    '11111111',
+  ],
+  planner: [
+    '01111110',
+    '11000011',
+    '10111101',
+    '10000001',
+    '10111101',
+    '10000001',
+    '10111101',
+    '11111111',
+  ],
+  security: [
+    '01111110',
+    '11111111',
+    '11111111',
+    '11011011',
+    '01111110',
+    '00111100',
+    '00011000',
+    '00001000',
+  ],
+  optimizer: [
+    '00001110',
+    '00011100',
+    '00111000',
+    '01111110',
+    '11111110',
+    '00011100',
+    '00001100',
+    '00000100',
+  ],
+  analyzer: [
+    '00011000',
+    '00111100',
+    '01111100',
+    '01111110',
+    '00111100',
+    '00011000',
+    '01111110',
+    '11111111',
+  ],
+  tester: [
+    '00110000',
+    '00110000',
+    '01111100',
+    '11111110',
+    '11111110',
+    '11011110',
+    '11111110',
+    '01111100',
+  ],
+  operator: [
+    '00010000',
+    '01111100',
+    '11000110',
+    '11111111',
+    '11111111',
+    '11000110',
+    '01111100',
+    '00010000',
+  ],
+  opensource: [
+    '01111100',
+    '10000010',
+    '10000010',
+    '10000010',
+    '11111110',
+    '10000001',
+    '10000001',
+    '11111111',
+  ],
+  gan: [
+    '01111110',
+    '10011001',
+    '11111111',
+    '11011011',
+    '01111110',
+    '00100100',
+    '01111110',
+    '00100100',
+  ],
+  network: [
+    '00010000',
+    '01111100',
+    '10010010',
+    '01111100',
+    '00010000',
+    '01110100',
+    '00111100',
+    '00011000',
+  ],
+  docs: [
+    '01111100',
+    '10000010',
+    '10000010',
+    '10111110',
+    '10100010',
+    '10100010',
+    '10111110',
+    '11111110',
+  ],
+  healthcare: [
+    '00111000',
+    '00111000',
+    '11111111',
+    '11111111',
+    '11111111',
+    '00111000',
+    '00111000',
+    '00000000',
+  ],
+  specialized: [
+    '00010000',
+    '01010100',
+    '00111000',
+    '11111111',
+    '00111000',
+    '01010100',
+    '10000010',
+    '00000000',
+  ],
+};
+
+// ── Render SVG sprite ──────────────────────────────────────────────────────
+function renderSprite(key, color, px = 5) {
+  const rows = SPRITES[key] || SPRITES.specialized;
+  const dim = px * 8;
+  const rects = rows.flatMap((row, y) =>
+    [...row].map((bit, x) =>
+      bit === '1'
+        ? `<rect x="${x*px}" y="${y*px}" width="${px}" height="${px}" fill="${color}"/>`
+        : ''
+    )
+  ).join('');
+  return `<svg width="${dim}" height="${dim}" viewBox="0 0 ${dim} ${dim}" xmlns="http://www.w3.org/2000/svg">${rects}</svg>`;
+}
+
+// ── Categories ─────────────────────────────────────────────────────────────
+const CATS = {
+  reviewer:   { label:'REVIEWER',    sprite:'reviewer',    color:'#00ff9d' },
+  resolver:   { label:'RESOLVER',    sprite:'resolver',    color:'#ff6b35' },
+  architect:  { label:'ARCHITECT',   sprite:'architect',   color:'#4fc3f7' },
+  planner:    { label:'PLANNER',     sprite:'planner',     color:'#ce93d8' },
+  tester:     { label:'TESTER',      sprite:'tester',      color:'#fff176' },
+  optimizer:  { label:'OPTIMIZER',   sprite:'optimizer',   color:'#ff4081' },
+  analyzer:   { label:'ANALYZER',    sprite:'analyzer',    color:'#40c4ff' },
+  operator:   { label:'OPERATOR',    sprite:'operator',    color:'#69f0ae' },
+  opensource: { label:'OPENSOURCE',  sprite:'opensource',  color:'#ffab40' },
+  gan:        { label:'GAN',         sprite:'gan',         color:'#e040fb' },
+  network:    { label:'NETWORK',     sprite:'network',     color:'#00e5ff' },
+  security:   { label:'SECURITY',    sprite:'security',    color:'#ff1744' },
+  docs:       { label:'DOCS',        sprite:'docs',        color:'#b2ff59' },
+  healthcare: { label:'HEALTH',      sprite:'healthcare',  color:'#f48fb1' },
+  specialized:{ label:'SPECIAL',     sprite:'specialized', color:'#ff6e40' },
+};
+
+function getCategory(name) {
+  if (name === 'security-reviewer')                               return 'security';
+  if (name === 'healthcare-reviewer')                             return 'healthcare';
+  if (name === 'database-reviewer')                               return 'reviewer';
+  if (name.endsWith('-reviewer'))                                 return 'reviewer';
+  if (name.endsWith('-build-resolver') || name === 'build-error-resolver') return 'resolver';
+  if (name.includes('architect'))                                 return 'architect';
+  if (name.includes('planner'))                                   return 'planner';
+  if (name === 'e2e-runner' || name === 'tdd-guide' || name === 'pr-test-analyzer') return 'tester';
+  if (name.includes('optimizer') || name === 'refactor-cleaner') return 'optimizer';
+  if (name.includes('analyzer') || name.includes('explorer') || name === 'silent-failure-hunter' || name === 'type-design-analyzer') return 'analyzer';
+  if (name === 'loop-operator' || name === 'code-simplifier')    return 'operator';
+  if (name.startsWith('opensource'))                              return 'opensource';
+  if (name.startsWith('gan'))                                     return 'gan';
+  if (name.startsWith('network'))                                 return 'network';
+  if (name === 'doc-updater' || name === 'docs-lookup')          return 'docs';
+  return 'specialized';
+}
+
+// ── Agent data ─────────────────────────────────────────────────────────────
+const AGENTS = [
+  { name:"a11y-architect",         desc:"Accessibility Architect specializing in WCAG 2.2 compliance for Web and Native platforms. Use PROACTIVELY when designing UI components, establishing design systems, or auditing code for inclusive user experiences.", tools:["Read","Write","Edit","Grep","Glob"], model:"sonnet" },
+  { name:"architect",              desc:"Software architecture specialist for system design, scalability, and technical decision-making. Use PROACTIVELY when planning new features, refactoring large systems, or making architectural decisions.", tools:["Read","Grep","Glob"], model:"opus" },
+  { name:"build-error-resolver",   desc:"Build and TypeScript error resolution specialist. Use PROACTIVELY when build fails or type errors occur. Fixes build/type errors only with minimal diffs, no architectural edits. Focuses on getting the build green quickly.", tools:["Read","Write","Edit","Bash","Grep","Glob"], model:"sonnet" },
+  { name:"chief-of-staff",         desc:"Personal communication chief of staff that triages email, Slack, LINE, and Messenger. Classifies messages into 4 tiers (skip/info_only/meeting_info/action_required), generates draft replies, and enforces post-send follow-through via hooks.", tools:["Read","Grep","Glob","Bash","Edit","Write"], model:"opus" },
+  { name:"code-architect",         desc:"Designs feature architectures by analyzing existing codebase patterns and conventions, then providing implementation blueprints with concrete files, interfaces, data flow, and build order.", tools:["Read","Grep","Glob","Bash"], model:"sonnet" },
+  { name:"code-explorer",          desc:"Deeply analyzes existing codebase features by tracing execution paths, mapping architecture layers, and documenting dependencies to inform new development.", tools:["Read","Grep","Glob"], model:"sonnet" },
+  { name:"code-reviewer",          desc:"Expert code review specialist. Proactively reviews code for quality, security, and maintainability. Use immediately after writing or modifying code. MUST BE USED for all code changes.", tools:["Read","Grep","Glob","Bash"], model:"sonnet" },
+  { name:"code-simplifier",        desc:"Simplifies and refines code for clarity, consistency, and maintainability while preserving behavior. Focus on recently modified code unless instructed otherwise.", tools:["Read","Write","Edit","Bash","Grep","Glob"], model:"sonnet" },
+  { name:"comment-analyzer",       desc:"Analyze code comments for accuracy, completeness, maintainability, and comment rot risk.", tools:["Read","Grep","Glob"], model:"sonnet" },
+  { name:"conversation-analyzer",  desc:"Use this agent when analyzing conversation transcripts to find behaviors worth preventing with hooks. Triggered by /hookify without arguments.", tools:["Read","Grep"], model:"sonnet" },
+  { name:"cpp-build-resolver",     desc:"C++ build, CMake, and compilation error resolution specialist. Fixes build errors, linker issues, and template errors with minimal changes. Use when C++ builds fail.", tools:["Read","Write","Edit","Bash","Grep","Glob"], model:"sonnet" },
+  { name:"cpp-reviewer",           desc:"Expert C++ code reviewer specializing in memory safety, modern C++ idioms, concurrency, and performance. Use for all C++ code changes. MUST BE USED for C++ projects.", tools:["Read","Grep","Glob","Bash"], model:"sonnet" },
+  { name:"csharp-reviewer",        desc:"Expert C# code reviewer specializing in .NET conventions, async patterns, security, nullable reference types, and performance. Use for all C# code changes. MUST BE USED for C# projects.", tools:["Read","Grep","Glob","Bash"], model:"sonnet" },
+  { name:"dart-build-resolver",    desc:"Dart/Flutter build, analysis, and dependency error resolution specialist. Fixes dart analyze errors, Flutter compilation failures, pub dependency conflicts, and build_runner issues with minimal changes.", tools:["Read","Write","Edit","Bash","Grep","Glob"], model:"sonnet" },
+  { name:"database-reviewer",      desc:"PostgreSQL database specialist for query optimization, schema design, security, and performance. Use PROACTIVELY when writing SQL, creating migrations, designing schemas, or troubleshooting database performance. Incorporates Supabase best practices.", tools:["Read","Write","Edit","Bash","Grep","Glob"], model:"sonnet" },
+  { name:"django-build-resolver",  desc:"Django/Python build, migration, and dependency error resolution specialist. Fixes pip/Poetry errors, migration conflicts, import errors, Django configuration issues, and collectstatic failures.", tools:["Read","Write","Edit","Bash","Grep","Glob"], model:"sonnet" },
+  { name:"django-reviewer",        desc:"Expert Django code reviewer specializing in ORM correctness, DRF patterns, migration safety, security misconfigurations, and production-grade Django practices. MUST BE USED for Django projects.", tools:["Read","Grep","Glob","Bash"], model:"sonnet" },
+  { name:"doc-updater",            desc:"Documentation and codemap specialist. Use PROACTIVELY for updating codemaps and documentation. Runs /update-codemaps and /update-docs, generates docs/CODEMAPS/*, updates READMEs and guides.", tools:["Read","Write","Edit","Bash","Grep","Glob"], model:"haiku" },
+  { name:"docs-lookup",            desc:"When the user asks how to use a library, framework, or API or needs up-to-date code examples, use Context7 MCP to fetch current documentation and return answers with examples.", tools:["Read","Grep","mcp:context7"], model:"sonnet" },
+  { name:"e2e-runner",             desc:"End-to-end testing specialist using Vercel Agent Browser (preferred) with Playwright fallback. Use PROACTIVELY for generating, maintaining, and running E2E tests. Manages test journeys, quarantines flaky tests.", tools:["Read","Write","Edit","Bash","Grep","Glob"], model:"sonnet" },
+  { name:"fastapi-reviewer",       desc:"Reviews FastAPI applications for async correctness, dependency injection, Pydantic schemas, security, OpenAPI quality, testing, and production readiness.", tools:["Read","Grep","Glob","Bash"], model:"sonnet" },
+  { name:"flutter-reviewer",       desc:"Flutter and Dart code reviewer. Reviews Flutter code for widget best practices, state management patterns, Dart idioms, performance pitfalls, accessibility, and clean architecture violations.", tools:["Read","Grep","Glob","Bash"], model:"sonnet" },
+  { name:"fsharp-reviewer",        desc:"Expert F# code reviewer specializing in functional idioms, type safety, pattern matching, computation expressions, and performance. Use for all F# code changes.", tools:["Read","Grep","Glob","Bash"], model:"sonnet" },
+  { name:"gan-evaluator",          desc:"GAN Harness Evaluator agent. Tests the live running application via Playwright, scores against rubric, and provides actionable feedback to the Generator.", tools:["Read","Write","Bash","Grep","Glob"], model:"opus" },
+  { name:"gan-generator",          desc:"GAN Harness Generator agent. Implements features according to the spec, reads evaluator feedback, and iterates until quality threshold is met.", tools:["Read","Write","Edit","Bash","Grep","Glob"], model:"opus" },
+  { name:"gan-planner",            desc:"GAN Harness Planner agent. Expands a one-line prompt into a full product specification with features, sprints, evaluation criteria, and design direction.", tools:["Read","Write","Grep","Glob"], model:"opus" },
+  { name:"go-build-resolver",      desc:"Go build, vet, and compilation error resolution specialist. Fixes build errors, go vet issues, and linter warnings with minimal changes. Use when Go builds fail.", tools:["Read","Write","Edit","Bash","Grep","Glob"], model:"sonnet" },
+  { name:"go-reviewer",            desc:"Expert Go code reviewer specializing in idiomatic Go, concurrency patterns, error handling, and performance. Use for all Go code changes. MUST BE USED for Go projects.", tools:["Read","Grep","Glob","Bash"], model:"sonnet" },
+  { name:"harmonyos-app-resolver", desc:"HarmonyOS application development expert specializing in ArkTS and ArkUI. Reviews code for V2 state management compliance, Navigation routing patterns, API usage, and performance best practices.", tools:["Read","Write","Edit","Bash","Grep","Glob"], model:"sonnet" },
+  { name:"harness-optimizer",      desc:"Analyze and improve the local agent harness configuration for reliability, cost, and throughput.", tools:["Read","Grep","Glob","Bash","Edit"], model:"sonnet" },
+  { name:"healthcare-reviewer",    desc:"Reviews healthcare application code for clinical safety, CDSS accuracy, PHI compliance, and medical data integrity. Specialized for EMR/EHR, clinical decision support, and health information systems.", tools:["Read","Grep","Glob"], model:"opus" },
+  { name:"homelab-architect",      desc:"Designs home and small-lab network plans from hardware inventory, goals, and operator experience level, with safe staged changes and rollback guidance.", tools:["Read","Grep"], model:"sonnet" },
+  { name:"java-build-resolver",    desc:"Java/Maven/Gradle build, compilation, and dependency error resolution specialist. Automatically detects Spring Boot or Quarkus and applies framework-specific fixes.", tools:["Read","Write","Edit","Bash","Grep","Glob"], model:"sonnet" },
+  { name:"java-reviewer",          desc:"Expert Java code reviewer for Spring Boot and Quarkus projects. Covers layered architecture, JPA/Panache, MongoDB, security, and concurrency. MUST BE USED for all Java code changes.", tools:["Read","Grep","Glob","Bash"], model:"sonnet" },
+  { name:"kotlin-build-resolver",  desc:"Kotlin/Gradle build, compilation, and dependency error resolution specialist. Fixes build errors, Kotlin compiler errors, and Gradle issues with minimal changes.", tools:["Read","Write","Edit","Bash","Grep","Glob"], model:"sonnet" },
+  { name:"kotlin-reviewer",        desc:"Kotlin and Android/KMP code reviewer. Reviews for idiomatic patterns, coroutine safety, Compose best practices, clean architecture violations, and common Android pitfalls.", tools:["Read","Grep","Glob","Bash"], model:"sonnet" },
+  { name:"loop-operator",          desc:"Operate autonomous agent loops, monitor progress, and intervene safely when loops stall.", tools:["Read","Grep","Glob","Bash","Edit"], model:"sonnet" },
+  { name:"mle-reviewer",           desc:"Production machine-learning engineering reviewer for data contracts, feature pipelines, training reproducibility, offline/online evaluation, model serving, monitoring, and rollback.", tools:["Read","Grep","Glob","Bash"], model:"sonnet" },
+  { name:"network-architect",      desc:"Designs enterprise or multi-site network architecture from requirements, using existing network skills for focused routing, validation, automation, and troubleshooting detail.", tools:["Read","Grep"], model:"sonnet" },
+  { name:"network-config-reviewer",desc:"Reviews router and switch configurations for security, correctness, stale references, risky change-window commands, and missing operational guardrails.", tools:["Read","Grep"], model:"sonnet" },
+  { name:"network-troubleshooter", desc:"Diagnoses network connectivity, routing, DNS, interface, and policy symptoms with a read-only OSI-layer workflow and evidence-backed root cause summary.", tools:["Read","Bash","Grep"], model:"sonnet" },
+  { name:"opensource-forker",      desc:"Fork any project for open-sourcing. Copies files, strips secrets and credentials (20+ patterns), replaces internal references with placeholders, generates .env.example, and cleans git history.", tools:["Read","Write","Edit","Bash","Grep","Glob"], model:"sonnet" },
+  { name:"opensource-packager",    desc:"Generate complete open-source packaging for a sanitized project. Produces CLAUDE.md, setup.sh, README.md, LICENSE, CONTRIBUTING.md, and GitHub issue templates.", tools:["Read","Write","Edit","Bash","Grep","Glob"], model:"sonnet" },
+  { name:"opensource-sanitizer",   desc:"Verify an open-source fork is fully sanitized before release. Scans for leaked secrets, PII, internal references, and dangerous files using 20+ regex patterns. Generates a PASS/FAIL report.", tools:["Read","Grep","Glob","Bash"], model:"sonnet" },
+  { name:"performance-optimizer",  desc:"Performance analysis and optimization specialist. Use PROACTIVELY for identifying bottlenecks, optimizing slow code, reducing bundle sizes, and improving runtime performance. Profiling, memory leaks, render optimization.", tools:["Read","Write","Edit","Bash","Grep","Glob"], model:"sonnet" },
+  { name:"planner",                desc:"Expert planning specialist for complex features and refactoring. Use PROACTIVELY when users request feature implementation, architectural changes, or complex refactoring. Automatically activated for planning tasks.", tools:["Read","Grep","Glob"], model:"opus" },
+  { name:"pr-test-analyzer",       desc:"Review pull request test coverage quality and completeness, with emphasis on behavioral coverage and real bug prevention.", tools:["Read","Grep","Glob","Bash"], model:"sonnet" },
+  { name:"python-reviewer",        desc:"Expert Python code reviewer specializing in PEP 8 compliance, Pythonic idioms, type hints, security, and performance. Use for all Python code changes. MUST BE USED for Python projects.", tools:["Read","Grep","Glob","Bash"], model:"sonnet" },
+  { name:"pytorch-build-resolver", desc:"PyTorch runtime, CUDA, and training error resolution specialist. Fixes tensor shape mismatches, device errors, gradient issues, DataLoader problems, and mixed precision failures.", tools:["Read","Write","Edit","Bash","Grep","Glob"], model:"sonnet" },
+  { name:"refactor-cleaner",       desc:"Dead code cleanup and consolidation specialist. Use PROACTIVELY for removing unused code, duplicates, and refactoring. Runs analysis tools (knip, depcheck, ts-prune) to identify dead code.", tools:["Read","Write","Edit","Bash","Grep","Glob"], model:"sonnet" },
+  { name:"rust-build-resolver",    desc:"Rust build, compilation, and dependency error resolution specialist. Fixes cargo build errors, borrow checker issues, and Cargo.toml problems with minimal changes.", tools:["Read","Write","Edit","Bash","Grep","Glob"], model:"sonnet" },
+  { name:"rust-reviewer",          desc:"Expert Rust code reviewer specializing in ownership, lifetimes, error handling, unsafe usage, and idiomatic patterns. Use for all Rust code changes. MUST BE USED for Rust projects.", tools:["Read","Grep","Glob","Bash"], model:"sonnet" },
+  { name:"security-reviewer",      desc:"Security vulnerability detection and remediation specialist. Use PROACTIVELY after writing code that handles user input, authentication, API endpoints, or sensitive data. Flags secrets, SSRF, injection, unsafe crypto, and OWASP Top 10.", tools:["Read","Write","Edit","Bash","Grep","Glob"], model:"sonnet" },
+  { name:"seo-specialist",         desc:"SEO specialist for technical SEO audits, on-page optimization, structured data, Core Web Vitals, and content/keyword mapping. Use for site audits, meta tag reviews, schema markup, sitemap and robots issues.", tools:["Read","Grep","Glob","WebSearch","WebFetch"], model:"sonnet" },
+  { name:"silent-failure-hunter",  desc:"Review code for silent failures, swallowed errors, bad fallbacks, and missing error propagation.", tools:["Read","Grep","Glob","Bash"], model:"sonnet" },
+  { name:"swift-build-resolver",   desc:"Swift/Xcode build, compilation, and dependency error resolution specialist. Fixes swift build errors, Xcode build failures, SPM dependency issues, and code signing problems.", tools:["Read","Write","Edit","Bash","Grep","Glob"], model:"sonnet" },
+  { name:"swift-reviewer",         desc:"Expert Swift code reviewer specializing in protocol-oriented design, value semantics, ARC memory management, Swift Concurrency, and idiomatic patterns.", tools:["Read","Grep","Glob","Bash"], model:"sonnet" },
+  { name:"tdd-guide",              desc:"Test-Driven Development specialist enforcing write-tests-first methodology. Use PROACTIVELY when writing new features, fixing bugs, or refactoring code. Ensures 80%+ test coverage.", tools:["Read","Write","Edit","Bash","Grep"], model:"sonnet" },
+  { name:"type-design-analyzer",   desc:"Analyze type design for encapsulation, invariant expression, usefulness, and enforcement.", tools:["Read","Grep","Glob"], model:"sonnet" },
+  { name:"typescript-reviewer",    desc:"Expert TypeScript/JavaScript code reviewer specializing in type safety, async correctness, Node/web security, and idiomatic patterns. Use for all TypeScript and JavaScript code changes.", tools:["Read","Grep","Glob","Bash"], model:"sonnet" },
+];
+
+// ── Build card element ─────────────────────────────────────────────────────
+function buildCard(agent, delay) {
+  const cat = getCategory(agent.name);
+  const { color, sprite, label } = CATS[cat] || CATS.specialized;
+
+  const card = document.createElement('div');
+  card.className = 'agent-card';
+  card.style.cssText = `--cc:${color}; animation-delay:${delay}ms`;
+  card.dataset.cat = cat;
+  card.dataset.q   = (agent.name + ' ' + agent.desc + ' ' + agent.tools.join(' ')).toLowerCase();
+
+  card.innerHTML = `
+    <div class="corner-tl"></div>
+    <div class="corner-br"></div>
+    <div class="card-top">
+      <div class="sprite-wrap" style="--cc:${color}">
+        ${renderSprite(sprite, color, 5)}
+      </div>
+      <div class="card-meta">
+        <div class="agent-name">${agent.name}</div>
+        <div class="badge-row">
+          <span class="badge badge-model ${agent.model}">${agent.model.toUpperCase()}</span>
+          <span class="badge badge-cat">${label}</span>
+        </div>
+      </div>
+    </div>
+    <div class="card-desc">${agent.desc}</div>
+    <div class="card-tools">
+      ${agent.tools.map(t => `<span class="tool-tag">${t}</span>`).join('')}
+    </div>
+  `;
+  return card;
+}
+
+// ── Stars ──────────────────────────────────────────────────────────────────
+function initStars(n = 60) {
+  for (let i = 0; i < n; i++) {
+    const s = document.createElement('div');
+    s.className = 'star';
+    s.style.left  = Math.random() * 100 + 'vw';
+    s.style.top   = Math.random() * 100 + 'vh';
+    s.style.setProperty('--d',     (2 + Math.random() * 5).toFixed(1) + 's');
+    s.style.setProperty('--delay', (Math.random() * 5).toFixed(1) + 's');
+    document.body.appendChild(s);
+  }
+}
+
+// ── Filter ─────────────────────────────────────────────────────────────────
+let activeCat = 'all';
+let query     = '';
+
+function applyFilters() {
+  const cards = document.querySelectorAll('.agent-card');
+  let n = 0;
+  cards.forEach(c => {
+    const ok = (activeCat === 'all' || c.dataset.cat === activeCat) &&
+               (!query || c.dataset.q.includes(query));
+    c.style.display = ok ? '' : 'none';
+    if (ok) n++;
+  });
+  document.getElementById('show-count').textContent = n;
+  document.getElementById('no-results').classList.toggle('show', n === 0);
+}
+
+// ── Init ───────────────────────────────────────────────────────────────────
+function init() {
+  initStars();
+
+  // Counts
+  const counts = { opus:0, sonnet:0, haiku:0 };
+  AGENTS.forEach(a => counts[a.model] = (counts[a.model] || 0) + 1);
+  document.getElementById('total-count').textContent  = AGENTS.length;
+  document.getElementById('show-count').textContent   = AGENTS.length;
+  document.getElementById('opus-count').textContent   = counts.opus;
+  document.getElementById('sonnet-count').textContent = counts.sonnet;
+  document.getElementById('haiku-count').textContent  = counts.haiku || 0;
+
+  // Category counts
+  const catCounts = {};
+  AGENTS.forEach(a => {
+    const c = getCategory(a.name);
+    catCounts[c] = (catCounts[c] || 0) + 1;
+  });
+
+  // Filter buttons
+  const fg = document.getElementById('filters');
+
+  const allBtn = document.createElement('button');
+  allBtn.className = 'filter-btn active';
+  allBtn.dataset.cat = 'all';
+  allBtn.style.setProperty('--active-col', '#00e5ff');
+  allBtn.style.color = '#00e5ff';
+  allBtn.innerHTML = `ALL <span class="cnt">(${AGENTS.length})</span>`;
+  allBtn.addEventListener('click', () => setFilter('all', allBtn));
+  fg.appendChild(allBtn);
+
+  const usedCats = Object.keys(catCounts).sort();
+  usedCats.forEach(cat => {
+    const { label, color } = CATS[cat];
+    const btn = document.createElement('button');
+    btn.className = 'filter-btn';
+    btn.dataset.cat = cat;
+    btn.style.setProperty('--active-col', color);
+    btn.style.color = color;
+    btn.innerHTML = `${label} <span class="cnt">(${catCounts[cat]})</span>`;
+    btn.addEventListener('click', () => setFilter(cat, btn));
+    fg.appendChild(btn);
+  });
+
+  function setFilter(cat, btn) {
+    activeCat = cat;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    applyFilters();
+  }
+
+  // Search
+  document.getElementById('search').addEventListener('input', e => {
+    query = e.target.value.toLowerCase().trim();
+    applyFilters();
+  });
+
+  // Render cards
+  const grid = document.getElementById('grid');
+  const noResults = document.getElementById('no-results');
+  AGENTS.forEach((agent, i) => {
+    const card = buildCard(agent, i * 25);
+    grid.insertBefore(card, noResults);
+  });
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
