@@ -3,364 +3,171 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>★ PIXEL AGENTS ★</title>
+  <title>★ PIXEL OFFICE ★</title>
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg:    #080510;
-      --bg2:   #0e0a1a;
-      --bg3:   #130d22;
-      --border:#2a1f4a;
-      --text:  #e8d5ff;
-      --dim:   #5a4a7a;
+      --bg:#080510; --bg2:#0e0a1a; --bg3:#130d22; --border:#2a1f4a;
+      --text:#e8d5ff; --dim:#5a4a7a;
+      --opus:#ffd700; --sonnet:#00e5ff; --haiku:#ff4fff;
+      --mod-office:#00e5ff; --mod-crm:#ce93d8; --mod-kanban:#fff176; --mod-inbox:#69f0ae;
+    }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{background:var(--bg);color:var(--text);font-family:'Press Start 2P',monospace;font-size:10px;min-height:100vh;overflow-x:hidden}
+    body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(255,255,255,.015) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.015) 1px,transparent 1px);background-size:16px 16px;pointer-events:none;z-index:0}
+    body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,.12) 3px,rgba(0,0,0,.12) 4px);pointer-events:none;z-index:9999}
+    .star{position:fixed;width:2px;height:2px;background:#fff;pointer-events:none;z-index:0;animation:twinkle var(--d,3s) var(--delay,0s) infinite}
+    @keyframes twinkle{0%,100%{opacity:.1}50%{opacity:.8}}
 
-      --reviewer:   #00ff9d;
-      --resolver:   #ff6b35;
-      --architect:  #4fc3f7;
-      --planner:    #ce93d8;
-      --tester:     #fff176;
-      --optimizer:  #ff4081;
-      --analyzer:   #40c4ff;
-      --operator:   #69f0ae;
-      --opensource: #ffab40;
-      --gan:        #e040fb;
-      --network:    #00e5ff;
-      --security:   #ff1744;
-      --docs:       #b2ff59;
-      --healthcare: #f48fb1;
-      --specialized:#ff6e40;
+    /* ── STICKY HEADER ── */
+    #sticky{position:sticky;top:0;z-index:100;background:var(--bg);border-bottom:2px solid var(--border)}
+    #header{padding:12px 28px 0}
+    .title-row{display:flex;align-items:baseline;gap:14px;margin-bottom:10px;flex-wrap:wrap}
+    .pixel-title{font-size:16px;letter-spacing:3px;background:linear-gradient(90deg,#ff4fff 0%,#00e5ff 50%,#ff4fff 100%);background-size:200%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:shimmer 4s linear infinite}
+    @keyframes shimmer{0%{background-position:0% 50%}100%{background-position:200% 50%}}
+    .cursor{display:inline-block;width:9px;height:14px;background:var(--sonnet);animation:blink 1s step-end infinite;vertical-align:middle;margin-left:2px}
+    @keyframes blink{50%{opacity:0}}
+    #tabs{display:flex;border-top:1px solid var(--border)}
+    .tab-btn{background:transparent;border:none;border-top:3px solid transparent;color:var(--dim);font-family:'Press Start 2P',monospace;font-size:6.5px;padding:9px 16px;cursor:pointer;letter-spacing:1px;transition:all .15s}
+    .tab-btn:hover{color:var(--text)}
+    .tab-btn.active{color:var(--tab-col,var(--sonnet));border-top-color:var(--tab-col,var(--sonnet));background:var(--bg2)}
+    .tab-badge{font-size:5px;padding:1px 5px;margin-left:4px;vertical-align:middle;color:#080510}
+    .ctrl-bar{padding:8px 28px 10px;display:flex;flex-wrap:wrap;gap:9px;align-items:center;border-top:1px solid var(--border)}
+    .ctrl-bar.hidden{display:none}
+    .stats-row{display:flex;gap:14px;font-size:6px;color:var(--dim);flex-wrap:wrap;margin-bottom:5px}
+    .stats-row b{color:var(--sonnet)}
+    .search-wrap{position:relative;flex:0 0 200px}
+    .search-icon{position:absolute;left:7px;top:50%;transform:translateY(-50%);color:var(--dim);font-size:11px;pointer-events:none}
+    .px-search{width:100%;background:var(--bg2);border:2px solid var(--border);color:var(--text);font-family:'Press Start 2P',monospace;font-size:6.5px;padding:6px 7px 6px 24px;outline:none;transition:border-color .2s}
+    .px-search:focus{border-color:var(--sonnet)}
+    .px-search::placeholder{color:var(--dim)}
+    .filter-group{display:flex;flex-wrap:wrap;gap:4px}
+    .filter-btn{background:var(--bg2);border:1px solid currentColor;color:var(--dim);font-family:'Press Start 2P',monospace;font-size:4.5px;padding:4px 6px;cursor:pointer;transition:all .12s;opacity:.7}
+    .filter-btn:hover{opacity:1;color:var(--text);border-color:var(--text)}
+    .filter-btn.active{background:var(--ac,var(--sonnet));border-color:var(--ac,var(--sonnet));color:#080510;opacity:1}
+    .px-btn{background:var(--bg2);border:2px solid var(--bc,var(--border));color:var(--bc,var(--text));font-family:'Press Start 2P',monospace;font-size:5.5px;padding:6px 11px;cursor:pointer;letter-spacing:.5px;transition:all .1s;white-space:nowrap}
+    .px-btn:hover{background:var(--bc,var(--border));color:#080510}
+    .px-btn.crm{--bc:var(--mod-crm)} .px-btn.kb{--bc:var(--mod-kanban)} .px-btn.mail{--bc:var(--mod-inbox)} .px-btn.danger{--bc:#ff1744} .px-btn.sm{font-size:4.5px;padding:4px 8px}
 
-      --opus:   #ffd700;
-      --sonnet: #00e5ff;
-      --haiku:  #ff4fff;
-    }
+    /* ── PANELS ── */
+    .panel{position:relative;z-index:1}
+    .panel.hidden{display:none!important}
 
-    * { margin:0; padding:0; box-sizing:border-box; }
+    /* ── OFFICE PANEL ── */
+    #panel-office{display:flex;flex-direction:column;align-items:center;background:var(--bg)}
+    #office-wrap{position:relative;width:100%;max-width:960px}
+    #office-canvas{display:block;width:100%;image-rendering:pixelated;cursor:crosshair}
+    #agent-info{
+      position:absolute;top:12px;right:12px;width:220px;
+      background:rgba(8,5,16,.97);border:2px solid var(--info-col,#00e5ff);
+      padding:14px;display:none;z-index:10;animation:infoIn .15s ease;
+    }
+    #agent-info.visible{display:block}
+    @keyframes infoIn{from{opacity:0;transform:translateX(8px)}to{opacity:1;transform:none}}
+    #agent-info::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--info-col,#00e5ff)}
+    .info-name{font-size:6.5px;color:var(--info-col,#00e5ff);margin-bottom:6px;word-break:break-word;line-height:1.8}
+    .info-cat{font-size:4.5px;color:var(--dim);margin-bottom:8px;letter-spacing:1px}
+    .info-desc{font-size:4px;color:#a090c0;line-height:2.2;margin-bottom:10px}
+    .info-tools{display:flex;flex-wrap:wrap;gap:3px;margin-bottom:8px}
+    .info-tool{font-size:3.5px;padding:2px 4px;border:1px solid var(--border);color:var(--dim)}
+    .info-model{font-size:5px}
+    .info-close{position:absolute;top:8px;right:8px;background:transparent;border:1px solid var(--dim);color:var(--dim);font-family:'Press Start 2P',monospace;font-size:6px;width:18px;height:18px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+    .info-close:hover{border-color:#ff1744;color:#ff1744}
 
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: 'Press Start 2P', monospace;
-      font-size: 10px;
-      min-height: 100vh;
-      overflow-x: hidden;
-    }
+    /* ── CRM ── */
+    #panel-crm{padding:20px 28px}
+    .crm-stats{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px}
+    .crm-stat{background:var(--bg2);border:1px solid var(--border);padding:7px 14px;text-align:center}
+    .crm-stat .sv{font-size:13px;color:var(--mod-crm);display:block;margin-bottom:3px}
+    .crm-stat .sl{font-size:3.5px;color:var(--dim)}
+    .pipeline{display:flex;gap:10px;overflow-x:auto;padding-bottom:10px}
+    .pipeline::-webkit-scrollbar{height:4px} .pipeline::-webkit-scrollbar-track{background:var(--bg)} .pipeline::-webkit-scrollbar-thumb{background:var(--border)}
+    .stage-col{flex:0 0 186px;background:var(--bg2);border:2px solid var(--sc,var(--border));position:relative}
+    .stage-col::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--sc,var(--border))}
+    .stage-head{padding:8px 10px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border)}
+    .stage-name{font-size:5px;color:var(--sc,var(--text));letter-spacing:1px}
+    .stage-cnt{background:var(--sc,var(--border));color:#080510;font-size:4.5px;padding:2px 5px}
+    .stage-cards{padding:7px;min-height:160px;display:flex;flex-direction:column;gap:7px}
+    .contact-card{background:var(--bg3);border:1px solid var(--border);padding:8px;cursor:pointer;transition:border-color .15s;position:relative}
+    .contact-card:hover{border-color:var(--mod-crm)}
+    .cc-name{font-size:5.5px;color:var(--text);margin-bottom:3px}
+    .cc-co{font-size:4.5px;color:var(--dim);margin-bottom:3px}
+    .cc-val{font-size:4.5px;color:var(--mod-crm)}
+    .cc-del{position:absolute;top:5px;right:5px;background:transparent;border:1px solid var(--dim);color:var(--dim);font-family:'Press Start 2P',monospace;font-size:4.5px;padding:2px 4px;cursor:pointer;opacity:0;transition:all .1s}
+    .contact-card:hover .cc-del{opacity:1}
+    .cc-del:hover{border-color:#ff1744;color:#ff1744}
 
-    /* Pixel grid background */
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background-image:
-        linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
-      background-size: 16px 16px;
-      pointer-events: none;
-      z-index: 0;
-    }
+    /* ── KANBAN ── */
+    #panel-kanban{padding:20px 28px}
+    .proj-tabs{display:flex;gap:7px;flex-wrap:wrap;align-items:center}
+    .proj-tab{background:var(--bg2);border:2px solid var(--border);color:var(--dim);font-family:'Press Start 2P',monospace;font-size:5px;padding:5px 10px;cursor:pointer;transition:all .15s}
+    .proj-tab.active{border-color:var(--mod-kanban);color:var(--mod-kanban)}
+    .proj-tab:hover{color:var(--text);border-color:var(--text)}
+    .board{display:flex;gap:12px;overflow-x:auto;padding-bottom:14px;min-height:55vh;align-items:flex-start}
+    .board::-webkit-scrollbar{height:4px} .board::-webkit-scrollbar-track{background:var(--bg)} .board::-webkit-scrollbar-thumb{background:var(--border)}
+    .board-col{flex:0 0 225px;background:var(--bg2);border:2px solid var(--cc2,var(--border));position:relative}
+    .board-col::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--cc2,var(--border))}
+    .board-col.drag-over{background:var(--bg3);border-color:var(--mod-kanban)}
+    .col-head{padding:10px 10px 8px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border)}
+    .col-name{font-size:5.5px;color:var(--cc2,var(--text));letter-spacing:1px}
+    .col-cnt{background:var(--cc2,var(--border));color:#080510;font-size:4.5px;padding:2px 5px}
+    .board-cards{padding:9px;min-height:230px;display:flex;flex-direction:column;gap:7px}
+    .kb-card{background:var(--bg3);border:1px solid var(--border);padding:9px;cursor:grab;transition:border-color .15s,opacity .1s;position:relative}
+    .kb-card:active{cursor:grabbing} .kb-card.dragging{opacity:.35} .kb-card:hover{border-color:var(--mod-kanban)}
+    .kb-title{font-size:5.5px;color:var(--text);margin-bottom:5px;line-height:1.6}
+    .kb-desc{font-size:4.5px;color:var(--dim);margin-bottom:7px;line-height:1.8;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+    .kb-foot{display:flex;justify-content:space-between;align-items:center}
+    .pri-badge{font-size:4px;padding:2px 4px;font-family:'Press Start 2P',monospace}
+    .p-LOW{background:#69f0ae;color:#080510} .p-MED{background:#fff176;color:#080510} .p-HIGH{background:#ffab40;color:#080510} .p-CRIT{background:#ff1744;color:#fff}
+    .kb-actions{display:flex;gap:3px;opacity:0;transition:opacity .15s}
+    .kb-card:hover .kb-actions{opacity:1}
+    .act-btn{background:transparent;border:1px solid var(--dim);color:var(--dim);font-family:'Press Start 2P',monospace;font-size:4.5px;padding:2px 4px;cursor:pointer;transition:all .1s}
+    .act-btn:hover{border-color:var(--text);color:var(--text)} .act-btn.del:hover{border-color:#ff1744;color:#ff1744}
+    .col-add{margin:0 9px 9px;width:calc(100% - 18px)}
 
-    /* CRT scanlines */
-    body::after {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background: repeating-linear-gradient(
-        0deg,
-        transparent,
-        transparent 3px,
-        rgba(0,0,0,0.12) 3px,
-        rgba(0,0,0,0.12) 4px
-      );
-      pointer-events: none;
-      z-index: 9999;
-    }
+    /* ── INBOX ── */
+    #panel-inbox{padding:20px 28px}
+    .inbox-layout{display:grid;grid-template-columns:290px 1fr;gap:12px;min-height:65vh}
+    @media(max-width:700px){.inbox-layout{grid-template-columns:1fr}}
+    .inbox-left{display:flex;flex-direction:column;gap:9px}
+    .folders-panel{background:var(--bg2);border:2px solid var(--border)}
+    .folder-btn{width:100%;background:transparent;border:none;border-bottom:1px solid var(--border);color:var(--dim);font-family:'Press Start 2P',monospace;font-size:5.5px;padding:9px 12px;cursor:pointer;text-align:left;display:flex;justify-content:space-between;align-items:center;transition:all .15s}
+    .folder-btn:last-child{border-bottom:none} .folder-btn:hover{color:var(--text);background:var(--bg3)} .folder-btn.active{color:var(--mod-inbox);background:var(--bg3)}
+    .f-badge{background:var(--mod-inbox);color:#080510;font-size:4.5px;padding:1px 5px}
+    .msg-list-panel{background:var(--bg2);border:2px solid var(--border);overflow-y:auto;max-height:calc(100vh - 280px)}
+    .msg-list-panel::-webkit-scrollbar{width:4px} .msg-list-panel::-webkit-scrollbar-track{background:var(--bg)} .msg-list-panel::-webkit-scrollbar-thumb{background:var(--border)}
+    .msg-row{padding:9px 11px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s;position:relative}
+    .msg-row:last-child{border-bottom:none} .msg-row:hover{background:var(--bg3)} .msg-row.active{background:var(--bg3);border-left:3px solid var(--mod-inbox);padding-left:8px}
+    .msg-row.unread .mr-from{color:var(--mod-inbox)} .msg-row.unread::after{content:'';position:absolute;top:50%;right:9px;transform:translateY(-50%);width:5px;height:5px;background:var(--mod-inbox)}
+    .mr-from{font-size:5px;color:var(--text);margin-bottom:3px} .mr-sub{font-size:4.5px;color:var(--dim);margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis} .mr-date{font-size:3.5px;color:var(--dim)}
+    .mr-pri{display:inline-block;font-size:3.5px;padding:1px 3px;margin-right:3px;font-family:'Press Start 2P',monospace}
+    .pri-URGENT{background:#ff1744;color:#fff} .pri-HIGH{background:#ffab40;color:#080510}
+    .inbox-right{background:var(--bg2);border:2px solid var(--border);display:flex;flex-direction:column}
+    .msg-empty{display:flex;align-items:center;justify-content:center;flex:1;color:var(--dim);font-size:6.5px;text-align:center;line-height:3;padding:30px}
+    .mv-head{padding:14px 18px;border-bottom:1px solid var(--border)}
+    .mv-sub{font-size:7.5px;color:var(--text);margin-bottom:9px;line-height:1.6}
+    .mv-meta{font-size:4.5px;color:var(--dim);line-height:2.2}
+    .mv-body{padding:18px;font-size:5.5px;color:var(--text);line-height:2.5;flex:1;overflow-y:auto;font-family:monospace;white-space:pre-wrap}
+    .mv-body::-webkit-scrollbar{width:4px} .mv-body::-webkit-scrollbar-track{background:var(--bg)} .mv-body::-webkit-scrollbar-thumb{background:var(--border)}
+    .mv-foot{padding:10px 18px;border-top:1px solid var(--border);display:flex;gap:7px}
 
-    /* Stars */
-    .star {
-      position: fixed;
-      width: 2px;
-      height: 2px;
-      background: #fff;
-      pointer-events: none;
-      z-index: 0;
-      animation: twinkle var(--d, 3s) var(--delay, 0s) infinite;
-    }
-    @keyframes twinkle {
-      0%,100% { opacity:.1; }
-      50%      { opacity:.8; }
-    }
-
-    /* ── Sticky wrapper ── */
-    #sticky {
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      background: var(--bg);
-      border-bottom: 2px solid var(--border);
-    }
-
-    /* ── Header ── */
-    #header {
-      padding: 20px 32px 14px;
-    }
-
-    .title-row {
-      display: flex;
-      align-items: baseline;
-      gap: 16px;
-      margin-bottom: 6px;
-      flex-wrap: wrap;
-    }
-
-    .pixel-title {
-      font-size: 20px;
-      letter-spacing: 3px;
-      background: linear-gradient(90deg, #ff4fff 0%, #00e5ff 50%, #ff4fff 100%);
-      background-size: 200%;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      animation: shimmer 4s linear infinite;
-    }
-    @keyframes shimmer {
-      0%   { background-position: 0%   50%; }
-      100% { background-position: 200% 50%; }
-    }
-
-    .cursor {
-      display: inline-block;
-      width: 10px; height: 18px;
-      background: var(--sonnet);
-      animation: blink 1s step-end infinite;
-      vertical-align: middle;
-      margin-left: 2px;
-    }
-    @keyframes blink { 50% { opacity: 0; } }
-
-    .stats-bar {
-      display: flex;
-      gap: 20px;
-      font-size: 7px;
-      color: var(--dim);
-      flex-wrap: wrap;
-    }
-    .stats-bar b { color: var(--sonnet); }
-
-    /* ── Controls ── */
-    #controls {
-      padding: 10px 32px 12px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      align-items: center;
-      border-top: 1px solid var(--border);
-    }
-
-    .search-wrap {
-      position: relative;
-      flex: 0 0 240px;
-    }
-    .search-icon {
-      position: absolute;
-      left: 8px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: var(--dim);
-      font-size: 12px;
-      pointer-events: none;
-    }
-    #search {
-      width: 100%;
-      background: var(--bg2);
-      border: 2px solid var(--border);
-      color: var(--text);
-      font-family: 'Press Start 2P', monospace;
-      font-size: 8px;
-      padding: 7px 8px 7px 26px;
-      outline: none;
-      transition: border-color .2s;
-    }
-    #search:focus {
-      border-color: var(--sonnet);
-      box-shadow: 0 0 8px rgba(0,229,255,.2);
-    }
-    #search::placeholder { color: var(--dim); }
-
-    .filter-group {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 5px;
-    }
-
-    .filter-btn {
-      background: var(--bg2);
-      border: 1px solid currentColor;
-      color: var(--dim);
-      font-family: 'Press Start 2P', monospace;
-      font-size: 5px;
-      padding: 4px 7px;
-      cursor: pointer;
-      transition: all .12s;
-      letter-spacing: .5px;
-      opacity: .7;
-    }
-    .filter-btn:hover { opacity: 1; color: var(--text); border-color: var(--text); }
-    .filter-btn.active {
-      background: var(--active-col, var(--sonnet));
-      border-color: var(--active-col, var(--sonnet));
-      color: #080510;
-      opacity: 1;
-    }
-    .filter-btn .cnt {
-      opacity: .7;
-      margin-left: 3px;
-    }
-
-    /* ── Grid ── */
-    #grid {
-      position: relative;
-      z-index: 1;
-      padding: 24px 32px;
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(272px, 1fr));
-      gap: 14px;
-    }
-
-    /* ── Card ── */
-    .agent-card {
-      background: var(--bg2);
-      border: 2px solid var(--cc, var(--border));
-      position: relative;
-      overflow: hidden;
-      animation: fadeUp .3s ease forwards;
-      opacity: 0;
-      transition: transform .1s, box-shadow .2s;
-    }
-    .agent-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 8px 28px rgba(0,0,0,.6),
-                  0 0 20px color-mix(in srgb, var(--cc) 25%, transparent);
-    }
-
-    @keyframes fadeUp {
-      from { opacity:0; transform: translateY(8px); }
-      to   { opacity:1; transform: translateY(0); }
-    }
-
-    /* Pixel corner accents */
-    .agent-card::before,
-    .agent-card::after {
-      content: '';
-      position: absolute;
-      width: 6px; height: 6px;
-      background: var(--cc, var(--border));
-    }
-    .agent-card::before { top:0; right:0; }
-    .agent-card::after  { bottom:0; left:0; }
-
-    /* Inner corner top-left */
-    .corner-tl, .corner-br {
-      position: absolute;
-      width: 6px; height: 6px;
-      background: var(--cc, var(--border));
-      z-index: 2;
-    }
-    .corner-tl { top:0;    left:0; }
-    .corner-br { bottom:0; right:0; }
-
-    .card-top {
-      padding: 16px 14px 12px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .sprite-wrap {
-      flex-shrink: 0;
-      width: 44px; height: 44px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .sprite-wrap svg {
-      image-rendering: pixelated;
-      animation: glow 2.5s ease-in-out infinite;
-    }
-    @keyframes glow {
-      0%,100% { filter: drop-shadow(0 0 3px var(--cc)); }
-      50%      { filter: drop-shadow(0 0 10px var(--cc)) drop-shadow(0 0 20px var(--cc)); }
-    }
-
-    .card-meta { flex: 1; min-width: 0; }
-
-    .agent-name {
-      font-size: 7.5px;
-      color: var(--cc, var(--text));
-      line-height: 1.6;
-      word-break: break-word;
-      margin-bottom: 7px;
-      letter-spacing: .5px;
-    }
-
-    .badge-row { display: flex; gap: 4px; flex-wrap: wrap; }
-
-    .badge {
-      font-size: 5px;
-      padding: 2px 5px;
-      letter-spacing: .8px;
-      font-family: 'Press Start 2P', monospace;
-      white-space: nowrap;
-    }
-    .badge-model { border: 1px solid; }
-    .badge-model.opus   { color: var(--opus);   border-color: var(--opus); }
-    .badge-model.sonnet { color: var(--sonnet); border-color: var(--sonnet); }
-    .badge-model.haiku  { color: var(--haiku);  border-color: var(--haiku); }
-    .badge-cat { background: var(--cc); color: #080510; }
-
-    .card-desc {
-      padding: 9px 14px;
-      font-size: 5.5px;
-      color: var(--dim);
-      line-height: 2;
-      display: -webkit-box;
-      -webkit-line-clamp: 3;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-      border-bottom: 1px solid var(--border);
-      min-height: 52px;
-    }
-
-    .card-tools {
-      padding: 7px 14px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 3px;
-    }
-    .tool-tag {
-      font-size: 4.5px;
-      padding: 2px 4px;
-      background: rgba(255,255,255,.03);
-      border: 1px solid var(--border);
-      color: var(--dim);
-      letter-spacing: .3px;
-    }
-
-    /* No results */
-    .no-results {
-      display: none;
-      grid-column: 1/-1;
-      text-align: center;
-      padding: 80px 20px;
-      color: var(--dim);
-      line-height: 3;
-    }
-    .no-results.show { display: block; }
-
-    /* Scrollbar */
-    ::-webkit-scrollbar { width: 5px; }
-    ::-webkit-scrollbar-track { background: var(--bg); }
-    ::-webkit-scrollbar-thumb { background: var(--border); }
-    ::-webkit-scrollbar-thumb:hover { background: var(--dim); }
+    /* ── MODAL ── */
+    #modal-overlay{position:fixed;inset:0;background:rgba(8,5,16,.9);z-index:1000;display:none;align-items:center;justify-content:center}
+    #modal-overlay.open{display:flex}
+    .modal{background:var(--bg2);border:2px solid var(--mc,var(--border));width:90%;max-width:490px;max-height:88vh;overflow-y:auto;position:relative;animation:mIn .18s ease}
+    @keyframes mIn{from{transform:translateY(-14px) scale(.97);opacity:0}to{transform:none;opacity:1}}
+    .modal::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--mc,var(--border))}
+    .modal-head{padding:16px 18px 12px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+    .modal-title{font-size:7.5px;color:var(--mc,var(--text));letter-spacing:1px}
+    .modal-x{background:transparent;border:1px solid var(--dim);color:var(--dim);font-family:'Press Start 2P',monospace;font-size:7px;width:24px;height:24px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .1s}
+    .modal-x:hover{border-color:#ff1744;color:#ff1744}
+    .modal-body{padding:18px} .modal-foot{padding:11px 18px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:7px}
+    .fg{margin-bottom:14px} .fl{display:block;font-size:5px;color:var(--dim);margin-bottom:5px;letter-spacing:1px}
+    .fi,.fs,.fta{width:100%;background:var(--bg3);border:2px solid var(--border);color:var(--text);font-family:'Press Start 2P',monospace;font-size:6.5px;padding:7px 9px;outline:none;transition:border-color .2s}
+    .fi:focus,.fs:focus,.fta:focus{border-color:var(--mc,var(--sonnet))}
+    .fta{resize:vertical;min-height:75px;line-height:1.8} .fs option{background:var(--bg3)}
+    .f2{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+    ::-webkit-scrollbar{width:4px} ::-webkit-scrollbar-track{background:var(--bg)} ::-webkit-scrollbar-thumb{background:var(--border)} ::-webkit-scrollbar-thumb:hover{background:var(--dim)}
   </style>
 </head>
 <body>
@@ -368,435 +175,870 @@
 <div id="sticky">
   <div id="header">
     <div class="title-row">
-      <span class="pixel-title">★ PIXEL AGENTS ★</span><span class="cursor"></span>
+      <span class="pixel-title">★ PIXEL OFFICE ★</span><span class="cursor"></span>
     </div>
-    <div class="stats-bar">
-      <span>AGENTS: <b id="total-count">0</b></span>
-      <span>VISIBLE: <b id="show-count">0</b></span>
-      <span>OPUS: <b id="opus-count" style="color:var(--opus)">0</b></span>
-      <span>SONNET: <b id="sonnet-count" style="color:var(--sonnet)">0</b></span>
-      <span>HAIKU: <b id="haiku-count" style="color:var(--haiku)">0</b></span>
+    <div id="tabs">
+      <button class="tab-btn active" data-tab="office" style="--tab-col:var(--mod-office)">
+        OFFICE <span class="tab-badge" style="background:var(--mod-office)" id="badge-office">0</span>
+      </button>
+      <button class="tab-btn" data-tab="crm" style="--tab-col:var(--mod-crm)">
+        CRM <span class="tab-badge" style="background:var(--mod-crm)" id="badge-crm">0</span>
+      </button>
+      <button class="tab-btn" data-tab="kanban" style="--tab-col:var(--mod-kanban)">
+        KANBAN <span class="tab-badge" style="background:var(--mod-kanban)" id="badge-kanban">0</span>
+      </button>
+      <button class="tab-btn" data-tab="inbox" style="--tab-col:var(--mod-inbox)">
+        INBOX <span class="tab-badge" style="background:var(--mod-inbox)" id="badge-inbox">0</span>
+      </button>
     </div>
   </div>
-  <div id="controls">
-    <div class="search-wrap">
-      <span class="search-icon">⌕</span>
-      <input type="text" id="search" placeholder="SEARCH...">
+  <div id="ctrl-office" class="ctrl-bar">
+    <div>
+      <div class="stats-row">
+        <span>AGENTS: <b id="total-count">0</b></span>
+        <span>OPUS: <b style="color:var(--opus)" id="opus-cnt">0</b></span>
+        <span>SONNET: <b style="color:var(--sonnet)" id="sonnet-cnt">0</b></span>
+        <span>HAIKU: <b style="color:var(--haiku)" id="haiku-cnt">0</b></span>
+        <span id="hint-txt" style="color:var(--dim)">CLICK AN AGENT TO INSPECT</span>
+      </div>
+      <div style="display:flex;gap:9px;flex-wrap:wrap;align-items:center">
+        <div class="search-wrap">
+          <span class="search-icon">⌕</span>
+          <input type="text" id="search" class="px-search" placeholder="SEARCH AGENTS...">
+        </div>
+        <div class="filter-group" id="model-filters">
+          <button class="filter-btn active" data-model="all" style="--ac:#00e5ff;color:#00e5ff">ALL</button>
+          <button class="filter-btn" data-model="opus" style="--ac:#ffd700;color:#ffd700">OPUS</button>
+          <button class="filter-btn" data-model="sonnet" style="--ac:#00e5ff;color:#00e5ff">SONNET</button>
+          <button class="filter-btn" data-model="haiku" style="--ac:#ff4fff;color:#ff4fff">HAIKU</button>
+        </div>
+      </div>
     </div>
-    <div class="filter-group" id="filters"></div>
+  </div>
+  <div id="ctrl-crm" class="ctrl-bar hidden">
+    <div class="search-wrap"><span class="search-icon">⌕</span><input type="text" id="crm-search" class="px-search" placeholder="SEARCH CONTACTS..."></div>
+    <button class="px-btn crm" onclick="CRM.showModal()">+ ADD CONTACT</button>
+  </div>
+  <div id="ctrl-kanban" class="ctrl-bar hidden">
+    <div class="proj-tabs" id="proj-tabs"></div>
+  </div>
+  <div id="ctrl-inbox" class="ctrl-bar hidden">
+    <button class="px-btn mail" onclick="INBOX.showCompose()">✉ COMPOSE</button>
   </div>
 </div>
 
-<div id="grid">
-  <div class="no-results" id="no-results">
-    &gt; NO AGENTS FOUND<br>
-    <span style="font-size:7px">TRY DIFFERENT KEYWORDS</span>
+<!-- PANELS -->
+<div id="panel-office" class="panel">
+  <div id="office-wrap">
+    <canvas id="office-canvas"></canvas>
+    <div id="agent-info">
+      <button class="info-close" onclick="OFFICE.deselect()">✕</button>
+      <div class="info-name" id="info-name"></div>
+      <div class="info-cat" id="info-cat"></div>
+      <div class="info-desc" id="info-desc"></div>
+      <div class="info-tools" id="info-tools"></div>
+      <div class="info-model" id="info-model"></div>
+    </div>
+  </div>
+</div>
+
+<div id="panel-crm" class="panel hidden">
+  <div id="crm-stats" class="crm-stats"></div>
+  <div style="padding:0 28px 24px"><div class="pipeline" id="crm-pipeline"></div></div>
+</div>
+
+<div id="panel-kanban" class="panel hidden">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px">
+    <span style="font-size:5px;color:var(--dim)">DRAG CARDS TO MOVE</span>
+    <button class="px-btn kb" onclick="KANBAN.showModal()">+ NEW CARD</button>
+  </div>
+  <div class="board" id="board"></div>
+</div>
+
+<div id="panel-inbox" class="panel hidden">
+  <div class="inbox-layout">
+    <div class="inbox-left">
+      <div class="folders-panel" id="inbox-folders"></div>
+      <div class="msg-list-panel" id="msg-list"></div>
+    </div>
+    <div class="inbox-right" id="inbox-right">
+      <div class="msg-empty">&gt; SELECT A MESSAGE<br><span style="font-size:5.5px">or compose a new one</span></div>
+    </div>
+  </div>
+</div>
+
+<div id="modal-overlay">
+  <div class="modal" id="modal-box">
+    <div class="modal-head">
+      <span class="modal-title" id="modal-title">MODAL</span>
+      <button class="modal-x" onclick="Modal.close()">✕</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+    <div class="modal-foot" id="modal-foot"></div>
   </div>
 </div>
 
 <script>
-// ── Pixel sprites (8×8 binary rows) ────────────────────────────────────────
-const SPRITES = {
-  reviewer: [
-    '00111000',
-    '01000100',
-    '01000100',
-    '00111100',
-    '00011110',
-    '00001111',
-    '00000110',
-    '00000000',
-  ],
-  resolver: [
-    '11000010',
-    '01100110',
-    '00111100',
-    '00011000',
-    '00111000',
-    '01110000',
-    '11100000',
-    '00000000',
-  ],
-  architect: [
-    '00011000',
-    '00111100',
-    '01011010',
-    '10011001',
-    '11111111',
-    '10011001',
-    '10011001',
-    '11111111',
-  ],
-  planner: [
-    '01111110',
-    '11000011',
-    '10111101',
-    '10000001',
-    '10111101',
-    '10000001',
-    '10111101',
-    '11111111',
-  ],
-  security: [
-    '01111110',
-    '11111111',
-    '11111111',
-    '11011011',
-    '01111110',
-    '00111100',
-    '00011000',
-    '00001000',
-  ],
-  optimizer: [
-    '00001110',
-    '00011100',
-    '00111000',
-    '01111110',
-    '11111110',
-    '00011100',
-    '00001100',
-    '00000100',
-  ],
-  analyzer: [
-    '00011000',
-    '00111100',
-    '01111100',
-    '01111110',
-    '00111100',
-    '00011000',
-    '01111110',
-    '11111111',
-  ],
-  tester: [
-    '00110000',
-    '00110000',
-    '01111100',
-    '11111110',
-    '11111110',
-    '11011110',
-    '11111110',
-    '01111100',
-  ],
-  operator: [
-    '00010000',
-    '01111100',
-    '11000110',
-    '11111111',
-    '11111111',
-    '11000110',
-    '01111100',
-    '00010000',
-  ],
-  opensource: [
-    '01111100',
-    '10000010',
-    '10000010',
-    '10000010',
-    '11111110',
-    '10000001',
-    '10000001',
-    '11111111',
-  ],
-  gan: [
-    '01111110',
-    '10011001',
-    '11111111',
-    '11011011',
-    '01111110',
-    '00100100',
-    '01111110',
-    '00100100',
-  ],
-  network: [
-    '00010000',
-    '01111100',
-    '10010010',
-    '01111100',
-    '00010000',
-    '01110100',
-    '00111100',
-    '00011000',
-  ],
-  docs: [
-    '01111100',
-    '10000010',
-    '10000010',
-    '10111110',
-    '10100010',
-    '10100010',
-    '10111110',
-    '11111110',
-  ],
-  healthcare: [
-    '00111000',
-    '00111000',
-    '11111111',
-    '11111111',
-    '11111111',
-    '00111000',
-    '00111000',
-    '00000000',
-  ],
-  specialized: [
-    '00010000',
-    '01010100',
-    '00111000',
-    '11111111',
-    '00111000',
-    '01010100',
-    '10000010',
-    '00000000',
-  ],
+// ═══════════════════════════════════════════════════════════════════
+// UTILITIES
+// ═══════════════════════════════════════════════════════════════════
+const UID  = () => Math.random().toString(36).slice(2,9)+Date.now().toString(36);
+const $    = id => document.getElementById(id);
+const esc  = s  => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const fmtD = d  => new Date(d).toLocaleDateString('es-ES',{day:'2-digit',month:'short',year:'2-digit'});
+const fmtM = n  => n>=1000?(n/1000).toFixed(1)+'K':String(n||0);
+const Store= {
+  get:(k)=>{ try{return JSON.parse(localStorage.getItem('pxa_'+k))}catch{return null} },
+  set:(k,v)=>localStorage.setItem('pxa_'+k,JSON.stringify(v))
 };
 
-// ── Render SVG sprite ──────────────────────────────────────────────────────
-function renderSprite(key, color, px = 5) {
-  const rows = SPRITES[key] || SPRITES.specialized;
-  const dim = px * 8;
-  const rects = rows.flatMap((row, y) =>
-    [...row].map((bit, x) =>
-      bit === '1'
-        ? `<rect x="${x*px}" y="${y*px}" width="${px}" height="${px}" fill="${color}"/>`
-        : ''
-    )
-  ).join('');
-  return `<svg width="${dim}" height="${dim}" viewBox="0 0 ${dim} ${dim}" xmlns="http://www.w3.org/2000/svg">${rects}</svg>`;
-}
-
-// ── Categories ─────────────────────────────────────────────────────────────
-const CATS = {
-  reviewer:   { label:'REVIEWER',    sprite:'reviewer',    color:'#00ff9d' },
-  resolver:   { label:'RESOLVER',    sprite:'resolver',    color:'#ff6b35' },
-  architect:  { label:'ARCHITECT',   sprite:'architect',   color:'#4fc3f7' },
-  planner:    { label:'PLANNER',     sprite:'planner',     color:'#ce93d8' },
-  tester:     { label:'TESTER',      sprite:'tester',      color:'#fff176' },
-  optimizer:  { label:'OPTIMIZER',   sprite:'optimizer',   color:'#ff4081' },
-  analyzer:   { label:'ANALYZER',    sprite:'analyzer',    color:'#40c4ff' },
-  operator:   { label:'OPERATOR',    sprite:'operator',    color:'#69f0ae' },
-  opensource: { label:'OPENSOURCE',  sprite:'opensource',  color:'#ffab40' },
-  gan:        { label:'GAN',         sprite:'gan',         color:'#e040fb' },
-  network:    { label:'NETWORK',     sprite:'network',     color:'#00e5ff' },
-  security:   { label:'SECURITY',    sprite:'security',    color:'#ff1744' },
-  docs:       { label:'DOCS',        sprite:'docs',        color:'#b2ff59' },
-  healthcare: { label:'HEALTH',      sprite:'healthcare',  color:'#f48fb1' },
-  specialized:{ label:'SPECIAL',     sprite:'specialized', color:'#ff6e40' },
-};
-
-function getCategory(name) {
-  if (name === 'security-reviewer')                               return 'security';
-  if (name === 'healthcare-reviewer')                             return 'healthcare';
-  if (name === 'database-reviewer')                               return 'reviewer';
-  if (name.endsWith('-reviewer'))                                 return 'reviewer';
-  if (name.endsWith('-build-resolver') || name === 'build-error-resolver') return 'resolver';
-  if (name.includes('architect'))                                 return 'architect';
-  if (name.includes('planner'))                                   return 'planner';
-  if (name === 'e2e-runner' || name === 'tdd-guide' || name === 'pr-test-analyzer') return 'tester';
-  if (name.includes('optimizer') || name === 'refactor-cleaner') return 'optimizer';
-  if (name.includes('analyzer') || name.includes('explorer') || name === 'silent-failure-hunter' || name === 'type-design-analyzer') return 'analyzer';
-  if (name === 'loop-operator' || name === 'code-simplifier')    return 'operator';
-  if (name.startsWith('opensource'))                              return 'opensource';
-  if (name.startsWith('gan'))                                     return 'gan';
-  if (name.startsWith('network'))                                 return 'network';
-  if (name === 'doc-updater' || name === 'docs-lookup')          return 'docs';
-  return 'specialized';
-}
-
-// ── Agent data ─────────────────────────────────────────────────────────────
-const AGENTS = [
-  { name:"a11y-architect",         desc:"Accessibility Architect specializing in WCAG 2.2 compliance for Web and Native platforms. Use PROACTIVELY when designing UI components, establishing design systems, or auditing code for inclusive user experiences.", tools:["Read","Write","Edit","Grep","Glob"], model:"sonnet" },
-  { name:"architect",              desc:"Software architecture specialist for system design, scalability, and technical decision-making. Use PROACTIVELY when planning new features, refactoring large systems, or making architectural decisions.", tools:["Read","Grep","Glob"], model:"opus" },
-  { name:"build-error-resolver",   desc:"Build and TypeScript error resolution specialist. Use PROACTIVELY when build fails or type errors occur. Fixes build/type errors only with minimal diffs, no architectural edits. Focuses on getting the build green quickly.", tools:["Read","Write","Edit","Bash","Grep","Glob"], model:"sonnet" },
-  { name:"chief-of-staff",         desc:"Personal communication chief of staff that triages email, Slack, LINE, and Messenger. Classifies messages into 4 tiers (skip/info_only/meeting_info/action_required), generates draft replies, and enforces post-send follow-through via hooks.", tools:["Read","Grep","Glob","Bash","Edit","Write"], model:"opus" },
-  { name:"code-architect",         desc:"Designs feature architectures by analyzing existing codebase patterns and conventions, then providing implementation blueprints with concrete files, interfaces, data flow, and build order.", tools:["Read","Grep","Glob","Bash"], model:"sonnet" },
-  { name:"code-explorer",          desc:"Deeply analyzes existing codebase features by tracing execution paths, mapping architecture layers, and documenting dependencies to inform new development.", tools:["Read","Grep","Glob"], model:"sonnet" },
-  { name:"code-reviewer",          desc:"Expert code review specialist. Proactively reviews code for quality, security, and maintainability. Use immediately after writing or modifying code. MUST BE USED for all code changes.", tools:["Read","Grep","Glob","Bash"], model:"sonnet" },
-  { name:"code-simplifier",        desc:"Simplifies and refines code for clarity, consistency, and maintainability while preserving behavior. Focus on recently modified code unless instructed otherwise.", tools:["Read","Write","Edit","Bash","Grep","Glob"], model:"sonnet" },
-  { name:"comment-analyzer",       desc:"Analyze code comments for accuracy, completeness, maintainability, and comment rot risk.", tools:["Read","Grep","Glob"], model:"sonnet" },
-  { name:"conversation-analyzer",  desc:"Use this agent when analyzing conversation transcripts to find behaviors worth preventing with hooks. Triggered by /hookify without arguments.", tools:["Read","Grep"], model:"sonnet" },
-  { name:"cpp-build-resolver",     desc:"C++ build, CMake, and compilation error resolution specialist. Fixes build errors, linker issues, and template errors with minimal changes. Use when C++ builds fail.", tools:["Read","Write","Edit","Bash","Grep","Glob"], model:"sonnet" },
-  { name:"cpp-reviewer",           desc:"Expert C++ code reviewer specializing in memory safety, modern C++ idioms, concurrency, and performance. Use for all C++ code changes. MUST BE USED for C++ projects.", tools:["Read","Grep","Glob","Bash"], model:"sonnet" },
-  { name:"csharp-reviewer",        desc:"Expert C# code reviewer specializing in .NET conventions, async patterns, security, nullable reference types, and performance. Use for all C# code changes. MUST BE USED for C# projects.", tools:["Read","Grep","Glob","Bash"], model:"sonnet" },
-  { name:"dart-build-resolver",    desc:"Dart/Flutter build, analysis, and dependency error resolution specialist. Fixes dart analyze errors, Flutter compilation failures, pub dependency conflicts, and build_runner issues with minimal changes.", tools:["Read","Write","Edit","Bash","Grep","Glob"], model:"sonnet" },
-  { name:"database-reviewer",      desc:"PostgreSQL database specialist for query optimization, schema design, security, and performance. Use PROACTIVELY when writing SQL, creating migrations, designing schemas, or troubleshooting database performance. Incorporates Supabase best practices.", tools:["Read","Write","Edit","Bash","Grep","Glob"], model:"sonnet" },
-  { name:"django-build-resolver",  desc:"Django/Python build, migration, and dependency error resolution specialist. Fixes pip/Poetry errors, migration conflicts, import errors, Django configuration issues, and collectstatic failures.", tools:["Read","Write","Edit","Bash","Grep","Glob"], model:"sonnet" },
-  { name:"django-reviewer",        desc:"Expert Django code reviewer specializing in ORM correctness, DRF patterns, migration safety, security misconfigurations, and production-grade Django practices. MUST BE USED for Django projects.", tools:["Read","Grep","Glob","Bash"], model:"sonnet" },
-  { name:"doc-updater",            desc:"Documentation and codemap specialist. Use PROACTIVELY for updating codemaps and documentation. Runs /update-codemaps and /update-docs, generates docs/CODEMAPS/*, updates READMEs and guides.", tools:["Read","Write","Edit","Bash","Grep","Glob"], model:"haiku" },
-  { name:"docs-lookup",            desc:"When the user asks how to use a library, framework, or API or needs up-to-date code examples, use Context7 MCP to fetch current documentation and return answers with examples.", tools:["Read","Grep","mcp:context7"], model:"sonnet" },
-  { name:"e2e-runner",             desc:"End-to-end testing specialist using Vercel Agent Browser (preferred) with Playwright fallback. Use PROACTIVELY for generating, maintaining, and running E2E tests. Manages test journeys, quarantines flaky tests.", tools:["Read","Write","Edit","Bash","Grep","Glob"], model:"sonnet" },
-  { name:"fastapi-reviewer",       desc:"Reviews FastAPI applications for async correctness, dependency injection, Pydantic schemas, security, OpenAPI quality, testing, and production readiness.", tools:["Read","Grep","Glob","Bash"], model:"sonnet" },
-  { name:"flutter-reviewer",       desc:"Flutter and Dart code reviewer. Reviews Flutter code for widget best practices, state management patterns, Dart idioms, performance pitfalls, accessibility, and clean architecture violations.", tools:["Read","Grep","Glob","Bash"], model:"sonnet" },
-  { name:"fsharp-reviewer",        desc:"Expert F# code reviewer specializing in functional idioms, type safety, pattern matching, computation expressions, and performance. Use for all F# code changes.", tools:["Read","Grep","Glob","Bash"], model:"sonnet" },
-  { name:"gan-evaluator",          desc:"GAN Harness Evaluator agent. Tests the live running application via Playwright, scores against rubric, and provides actionable feedback to the Generator.", tools:["Read","Write","Bash","Grep","Glob"], model:"opus" },
-  { name:"gan-generator",          desc:"GAN Harness Generator agent. Implements features according to the spec, reads evaluator feedback, and iterates until quality threshold is met.", tools:["Read","Write","Edit","Bash","Grep","Glob"], model:"opus" },
-  { name:"gan-planner",            desc:"GAN Harness Planner agent. Expands a one-line prompt into a full product specification with features, sprints, evaluation criteria, and design direction.", tools:["Read","Write","Grep","Glob"], model:"opus" },
-  { name:"go-build-resolver",      desc:"Go build, vet, and compilation error resolution specialist. Fixes build errors, go vet issues, and linter warnings with minimal changes. Use when Go builds fail.", tools:["Read","Write","Edit","Bash","Grep","Glob"], model:"sonnet" },
-  { name:"go-reviewer",            desc:"Expert Go code reviewer specializing in idiomatic Go, concurrency patterns, error handling, and performance. Use for all Go code changes. MUST BE USED for Go projects.", tools:["Read","Grep","Glob","Bash"], model:"sonnet" },
-  { name:"harmonyos-app-resolver", desc:"HarmonyOS application development expert specializing in ArkTS and ArkUI. Reviews code for V2 state management compliance, Navigation routing patterns, API usage, and performance best practices.", tools:["Read","Write","Edit","Bash","Grep","Glob"], model:"sonnet" },
-  { name:"harness-optimizer",      desc:"Analyze and improve the local agent harness configuration for reliability, cost, and throughput.", tools:["Read","Grep","Glob","Bash","Edit"], model:"sonnet" },
-  { name:"healthcare-reviewer",    desc:"Reviews healthcare application code for clinical safety, CDSS accuracy, PHI compliance, and medical data integrity. Specialized for EMR/EHR, clinical decision support, and health information systems.", tools:["Read","Grep","Glob"], model:"opus" },
-  { name:"homelab-architect",      desc:"Designs home and small-lab network plans from hardware inventory, goals, and operator experience level, with safe staged changes and rollback guidance.", tools:["Read","Grep"], model:"sonnet" },
-  { name:"java-build-resolver",    desc:"Java/Maven/Gradle build, compilation, and dependency error resolution specialist. Automatically detects Spring Boot or Quarkus and applies framework-specific fixes.", tools:["Read","Write","Edit","Bash","Grep","Glob"], model:"sonnet" },
-  { name:"java-reviewer",          desc:"Expert Java code reviewer for Spring Boot and Quarkus projects. Covers layered architecture, JPA/Panache, MongoDB, security, and concurrency. MUST BE USED for all Java code changes.", tools:["Read","Grep","Glob","Bash"], model:"sonnet" },
-  { name:"kotlin-build-resolver",  desc:"Kotlin/Gradle build, compilation, and dependency error resolution specialist. Fixes build errors, Kotlin compiler errors, and Gradle issues with minimal changes.", tools:["Read","Write","Edit","Bash","Grep","Glob"], model:"sonnet" },
-  { name:"kotlin-reviewer",        desc:"Kotlin and Android/KMP code reviewer. Reviews for idiomatic patterns, coroutine safety, Compose best practices, clean architecture violations, and common Android pitfalls.", tools:["Read","Grep","Glob","Bash"], model:"sonnet" },
-  { name:"loop-operator",          desc:"Operate autonomous agent loops, monitor progress, and intervene safely when loops stall.", tools:["Read","Grep","Glob","Bash","Edit"], model:"sonnet" },
-  { name:"mle-reviewer",           desc:"Production machine-learning engineering reviewer for data contracts, feature pipelines, training reproducibility, offline/online evaluation, model serving, monitoring, and rollback.", tools:["Read","Grep","Glob","Bash"], model:"sonnet" },
-  { name:"network-architect",      desc:"Designs enterprise or multi-site network architecture from requirements, using existing network skills for focused routing, validation, automation, and troubleshooting detail.", tools:["Read","Grep"], model:"sonnet" },
-  { name:"network-config-reviewer",desc:"Reviews router and switch configurations for security, correctness, stale references, risky change-window commands, and missing operational guardrails.", tools:["Read","Grep"], model:"sonnet" },
-  { name:"network-troubleshooter", desc:"Diagnoses network connectivity, routing, DNS, interface, and policy symptoms with a read-only OSI-layer workflow and evidence-backed root cause summary.", tools:["Read","Bash","Grep"], model:"sonnet" },
-  { name:"opensource-forker",      desc:"Fork any project for open-sourcing. Copies files, strips secrets and credentials (20+ patterns), replaces internal references with placeholders, generates .env.example, and cleans git history.", tools:["Read","Write","Edit","Bash","Grep","Glob"], model:"sonnet" },
-  { name:"opensource-packager",    desc:"Generate complete open-source packaging for a sanitized project. Produces CLAUDE.md, setup.sh, README.md, LICENSE, CONTRIBUTING.md, and GitHub issue templates.", tools:["Read","Write","Edit","Bash","Grep","Glob"], model:"sonnet" },
-  { name:"opensource-sanitizer",   desc:"Verify an open-source fork is fully sanitized before release. Scans for leaked secrets, PII, internal references, and dangerous files using 20+ regex patterns. Generates a PASS/FAIL report.", tools:["Read","Grep","Glob","Bash"], model:"sonnet" },
-  { name:"performance-optimizer",  desc:"Performance analysis and optimization specialist. Use PROACTIVELY for identifying bottlenecks, optimizing slow code, reducing bundle sizes, and improving runtime performance. Profiling, memory leaks, render optimization.", tools:["Read","Write","Edit","Bash","Grep","Glob"], model:"sonnet" },
-  { name:"planner",                desc:"Expert planning specialist for complex features and refactoring. Use PROACTIVELY when users request feature implementation, architectural changes, or complex refactoring. Automatically activated for planning tasks.", tools:["Read","Grep","Glob"], model:"opus" },
-  { name:"pr-test-analyzer",       desc:"Review pull request test coverage quality and completeness, with emphasis on behavioral coverage and real bug prevention.", tools:["Read","Grep","Glob","Bash"], model:"sonnet" },
-  { name:"python-reviewer",        desc:"Expert Python code reviewer specializing in PEP 8 compliance, Pythonic idioms, type hints, security, and performance. Use for all Python code changes. MUST BE USED for Python projects.", tools:["Read","Grep","Glob","Bash"], model:"sonnet" },
-  { name:"pytorch-build-resolver", desc:"PyTorch runtime, CUDA, and training error resolution specialist. Fixes tensor shape mismatches, device errors, gradient issues, DataLoader problems, and mixed precision failures.", tools:["Read","Write","Edit","Bash","Grep","Glob"], model:"sonnet" },
-  { name:"refactor-cleaner",       desc:"Dead code cleanup and consolidation specialist. Use PROACTIVELY for removing unused code, duplicates, and refactoring. Runs analysis tools (knip, depcheck, ts-prune) to identify dead code.", tools:["Read","Write","Edit","Bash","Grep","Glob"], model:"sonnet" },
-  { name:"rust-build-resolver",    desc:"Rust build, compilation, and dependency error resolution specialist. Fixes cargo build errors, borrow checker issues, and Cargo.toml problems with minimal changes.", tools:["Read","Write","Edit","Bash","Grep","Glob"], model:"sonnet" },
-  { name:"rust-reviewer",          desc:"Expert Rust code reviewer specializing in ownership, lifetimes, error handling, unsafe usage, and idiomatic patterns. Use for all Rust code changes. MUST BE USED for Rust projects.", tools:["Read","Grep","Glob","Bash"], model:"sonnet" },
-  { name:"security-reviewer",      desc:"Security vulnerability detection and remediation specialist. Use PROACTIVELY after writing code that handles user input, authentication, API endpoints, or sensitive data. Flags secrets, SSRF, injection, unsafe crypto, and OWASP Top 10.", tools:["Read","Write","Edit","Bash","Grep","Glob"], model:"sonnet" },
-  { name:"seo-specialist",         desc:"SEO specialist for technical SEO audits, on-page optimization, structured data, Core Web Vitals, and content/keyword mapping. Use for site audits, meta tag reviews, schema markup, sitemap and robots issues.", tools:["Read","Grep","Glob","WebSearch","WebFetch"], model:"sonnet" },
-  { name:"silent-failure-hunter",  desc:"Review code for silent failures, swallowed errors, bad fallbacks, and missing error propagation.", tools:["Read","Grep","Glob","Bash"], model:"sonnet" },
-  { name:"swift-build-resolver",   desc:"Swift/Xcode build, compilation, and dependency error resolution specialist. Fixes swift build errors, Xcode build failures, SPM dependency issues, and code signing problems.", tools:["Read","Write","Edit","Bash","Grep","Glob"], model:"sonnet" },
-  { name:"swift-reviewer",         desc:"Expert Swift code reviewer specializing in protocol-oriented design, value semantics, ARC memory management, Swift Concurrency, and idiomatic patterns.", tools:["Read","Grep","Glob","Bash"], model:"sonnet" },
-  { name:"tdd-guide",              desc:"Test-Driven Development specialist enforcing write-tests-first methodology. Use PROACTIVELY when writing new features, fixing bugs, or refactoring code. Ensures 80%+ test coverage.", tools:["Read","Write","Edit","Bash","Grep"], model:"sonnet" },
-  { name:"type-design-analyzer",   desc:"Analyze type design for encapsulation, invariant expression, usefulness, and enforcement.", tools:["Read","Grep","Glob"], model:"sonnet" },
-  { name:"typescript-reviewer",    desc:"Expert TypeScript/JavaScript code reviewer specializing in type safety, async correctness, Node/web security, and idiomatic patterns. Use for all TypeScript and JavaScript code changes.", tools:["Read","Grep","Glob","Bash"], model:"sonnet" },
-];
-
-// ── Build card element ─────────────────────────────────────────────────────
-function buildCard(agent, delay) {
-  const cat = getCategory(agent.name);
-  const { color, sprite, label } = CATS[cat] || CATS.specialized;
-
-  const card = document.createElement('div');
-  card.className = 'agent-card';
-  card.style.cssText = `--cc:${color}; animation-delay:${delay}ms`;
-  card.dataset.cat = cat;
-  card.dataset.q   = (agent.name + ' ' + agent.desc + ' ' + agent.tools.join(' ')).toLowerCase();
-
-  card.innerHTML = `
-    <div class="corner-tl"></div>
-    <div class="corner-br"></div>
-    <div class="card-top">
-      <div class="sprite-wrap" style="--cc:${color}">
-        ${renderSprite(sprite, color, 5)}
-      </div>
-      <div class="card-meta">
-        <div class="agent-name">${agent.name}</div>
-        <div class="badge-row">
-          <span class="badge badge-model ${agent.model}">${agent.model.toUpperCase()}</span>
-          <span class="badge badge-cat">${label}</span>
-        </div>
-      </div>
-    </div>
-    <div class="card-desc">${agent.desc}</div>
-    <div class="card-tools">
-      ${agent.tools.map(t => `<span class="tool-tag">${t}</span>`).join('')}
-    </div>
-  `;
-  return card;
-}
-
-// ── Stars ──────────────────────────────────────────────────────────────────
-function initStars(n = 60) {
-  for (let i = 0; i < n; i++) {
-    const s = document.createElement('div');
-    s.className = 'star';
-    s.style.left  = Math.random() * 100 + 'vw';
-    s.style.top   = Math.random() * 100 + 'vh';
-    s.style.setProperty('--d',     (2 + Math.random() * 5).toFixed(1) + 's');
-    s.style.setProperty('--delay', (Math.random() * 5).toFixed(1) + 's');
+function initStars(n=50){
+  for(let i=0;i<n;i++){
+    const s=document.createElement('div');
+    s.className='star';
+    s.style.left=Math.random()*100+'vw';
+    s.style.top=Math.random()*100+'vh';
+    s.style.setProperty('--d',(2+Math.random()*5).toFixed(1)+'s');
+    s.style.setProperty('--delay',(Math.random()*5).toFixed(1)+'s');
     document.body.appendChild(s);
   }
 }
 
-// ── Filter ─────────────────────────────────────────────────────────────────
-let activeCat = 'all';
-let query     = '';
+// ═══════════════════════════════════════════════════════════════════
+// MODAL
+// ═══════════════════════════════════════════════════════════════════
+const Modal={
+  open(title,body,foot,color='#00e5ff'){
+    $('modal-box').style.setProperty('--mc',color);
+    $('modal-title').textContent=title;
+    $('modal-body').innerHTML=body;
+    $('modal-foot').innerHTML=foot;
+    $('modal-overlay').classList.add('open');
+    const first=$('modal-body').querySelector('input,select,textarea');
+    if(first) setTimeout(()=>first.focus(),80);
+  },
+  close(){ $('modal-overlay').classList.remove('open'); }
+};
+$('modal-overlay').addEventListener('click',e=>{ if(e.target===$('modal-overlay'))Modal.close(); });
 
-function applyFilters() {
-  const cards = document.querySelectorAll('.agent-card');
-  let n = 0;
-  cards.forEach(c => {
-    const ok = (activeCat === 'all' || c.dataset.cat === activeCat) &&
-               (!query || c.dataset.q.includes(query));
-    c.style.display = ok ? '' : 'none';
-    if (ok) n++;
+// ═══════════════════════════════════════════════════════════════════
+// TABS
+// ═══════════════════════════════════════════════════════════════════
+const TABS=['office','crm','kanban','inbox'];
+let activeTab='office';
+function switchTab(tab){
+  activeTab=tab;
+  TABS.forEach(t=>{
+    document.querySelector(`.tab-btn[data-tab="${t}"]`).classList.toggle('active',t===tab);
+    $('panel-'+t).classList.toggle('hidden',t!==tab);
+    $('ctrl-'+t).classList.toggle('hidden',t!==tab);
   });
-  document.getElementById('show-count').textContent = n;
-  document.getElementById('no-results').classList.toggle('show', n === 0);
+}
+document.querySelectorAll('.tab-btn').forEach(b=>b.addEventListener('click',()=>switchTab(b.dataset.tab)));
+
+// ═══════════════════════════════════════════════════════════════════
+// AGENT DATA & CATEGORIES
+// ═══════════════════════════════════════════════════════════════════
+const CATS={
+  reviewer:   {label:'REVIEWER',   color:'#00ff9d'},
+  resolver:   {label:'RESOLVER',   color:'#ff6b35'},
+  architect:  {label:'ARCHITECT',  color:'#4fc3f7'},
+  planner:    {label:'PLANNER',    color:'#ce93d8'},
+  tester:     {label:'TESTER',     color:'#fff176'},
+  optimizer:  {label:'OPTIMIZER',  color:'#ff4081'},
+  analyzer:   {label:'ANALYZER',   color:'#40c4ff'},
+  operator:   {label:'OPERATOR',   color:'#69f0ae'},
+  opensource: {label:'OPENSOURCE', color:'#ffab40'},
+  gan:        {label:'GAN',        color:'#e040fb'},
+  network:    {label:'NETWORK',    color:'#00e5ff'},
+  security:   {label:'SECURITY',   color:'#ff1744'},
+  docs:       {label:'DOCS',       color:'#b2ff59'},
+  healthcare: {label:'HEALTH',     color:'#f48fb1'},
+  specialized:{label:'SPECIAL',    color:'#ff6e40'},
+};
+function getCat(name){
+  if(name==='security-reviewer')                                      return'security';
+  if(name==='healthcare-reviewer')                                    return'healthcare';
+  if(name==='database-reviewer')                                      return'reviewer';
+  if(name.endsWith('-reviewer'))                                      return'reviewer';
+  if(name.endsWith('-build-resolver')||name==='build-error-resolver') return'resolver';
+  if(name.includes('architect'))                                      return'architect';
+  if(name.includes('planner'))                                        return'planner';
+  if(['e2e-runner','tdd-guide','pr-test-analyzer'].includes(name))    return'tester';
+  if(name.includes('optimizer')||name==='refactor-cleaner')           return'optimizer';
+  if(name.includes('analyzer')||name.includes('explorer')||name==='silent-failure-hunter'||name==='type-design-analyzer') return'analyzer';
+  if(name==='loop-operator'||name==='code-simplifier')                return'operator';
+  if(name.startsWith('opensource'))                                   return'opensource';
+  if(name.startsWith('gan'))                                          return'gan';
+  if(name.startsWith('network'))                                      return'network';
+  if(name==='doc-updater'||name==='docs-lookup')                      return'docs';
+  return'specialized';
 }
 
-// ── Init ───────────────────────────────────────────────────────────────────
-function init() {
-  initStars();
+const AGENTS=[
+  {name:"a11y-architect",        desc:"Accessibility Architect specializing in WCAG 2.2 compliance for Web and Native platforms. Use PROACTIVELY when designing UI components, establishing design systems, or auditing code for inclusive user experiences.",tools:["Read","Write","Edit","Grep","Glob"],model:"sonnet"},
+  {name:"architect",             desc:"Software architecture specialist for system design, scalability, and technical decision-making. Use PROACTIVELY when planning new features, refactoring large systems, or making architectural decisions.",tools:["Read","Grep","Glob"],model:"opus"},
+  {name:"build-error-resolver",  desc:"Build and TypeScript error resolution specialist. Use PROACTIVELY when build fails or type errors occur. Fixes build/type errors only with minimal diffs, no architectural edits.",tools:["Read","Write","Edit","Bash","Grep","Glob"],model:"sonnet"},
+  {name:"chief-of-staff",        desc:"Personal communication chief of staff that triages email, Slack, LINE, and Messenger. Classifies messages into 4 tiers and generates draft replies.",tools:["Read","Grep","Glob","Bash","Edit","Write"],model:"opus"},
+  {name:"code-architect",        desc:"Designs feature architectures by analyzing existing codebase patterns and conventions, then providing implementation blueprints with concrete files, interfaces, data flow, and build order.",tools:["Read","Grep","Glob","Bash"],model:"sonnet"},
+  {name:"code-explorer",         desc:"Deeply analyzes existing codebase features by tracing execution paths, mapping architecture layers, and documenting dependencies to inform new development.",tools:["Read","Grep","Glob"],model:"sonnet"},
+  {name:"code-reviewer",         desc:"Expert code review specialist. Proactively reviews code for quality, security, and maintainability. Use immediately after writing or modifying code. MUST BE USED for all code changes.",tools:["Read","Grep","Glob","Bash"],model:"sonnet"},
+  {name:"code-simplifier",       desc:"Simplifies and refines code for clarity, consistency, and maintainability while preserving behavior.",tools:["Read","Write","Edit","Bash","Grep","Glob"],model:"sonnet"},
+  {name:"comment-analyzer",      desc:"Analyze code comments for accuracy, completeness, maintainability, and comment rot risk.",tools:["Read","Grep","Glob"],model:"sonnet"},
+  {name:"conversation-analyzer", desc:"Use this agent when analyzing conversation transcripts to find behaviors worth preventing with hooks.",tools:["Read","Grep"],model:"sonnet"},
+  {name:"cpp-build-resolver",    desc:"C++ build, CMake, and compilation error resolution specialist. Fixes build errors, linker issues, and template errors with minimal changes.",tools:["Read","Write","Edit","Bash","Grep","Glob"],model:"sonnet"},
+  {name:"cpp-reviewer",          desc:"Expert C++ code reviewer specializing in memory safety, modern C++ idioms, concurrency, and performance. MUST BE USED for C++ projects.",tools:["Read","Grep","Glob","Bash"],model:"sonnet"},
+  {name:"csharp-reviewer",       desc:"Expert C# code reviewer specializing in .NET conventions, async patterns, security, nullable reference types, and performance.",tools:["Read","Grep","Glob","Bash"],model:"sonnet"},
+  {name:"dart-build-resolver",   desc:"Dart/Flutter build, analysis, and dependency error resolution specialist. Fixes dart analyze errors, Flutter compilation failures, pub dependency conflicts.",tools:["Read","Write","Edit","Bash","Grep","Glob"],model:"sonnet"},
+  {name:"database-reviewer",     desc:"PostgreSQL database specialist for query optimization, schema design, security, and performance. Incorporates Supabase best practices.",tools:["Read","Write","Edit","Bash","Grep","Glob"],model:"sonnet"},
+  {name:"django-build-resolver", desc:"Django/Python build, migration, and dependency error resolution specialist. Fixes pip/Poetry errors, migration conflicts, import errors.",tools:["Read","Write","Edit","Bash","Grep","Glob"],model:"sonnet"},
+  {name:"django-reviewer",       desc:"Expert Django code reviewer specializing in ORM correctness, DRF patterns, migration safety, and security misconfigurations. MUST BE USED for Django projects.",tools:["Read","Grep","Glob","Bash"],model:"sonnet"},
+  {name:"doc-updater",           desc:"Documentation and codemap specialist. Use PROACTIVELY for updating codemaps and documentation. Runs /update-codemaps and /update-docs.",tools:["Read","Write","Edit","Bash","Grep","Glob"],model:"haiku"},
+  {name:"docs-lookup",           desc:"When the user asks how to use a library, framework, or API, use Context7 MCP to fetch current documentation and return answers with examples.",tools:["Read","Grep","mcp:context7"],model:"sonnet"},
+  {name:"e2e-runner",            desc:"End-to-end testing specialist using Vercel Agent Browser with Playwright fallback. Use PROACTIVELY for generating, maintaining, and running E2E tests.",tools:["Read","Write","Edit","Bash","Grep","Glob"],model:"sonnet"},
+  {name:"fastapi-reviewer",      desc:"Reviews FastAPI applications for async correctness, dependency injection, Pydantic schemas, security, OpenAPI quality, testing, and production readiness.",tools:["Read","Grep","Glob","Bash"],model:"sonnet"},
+  {name:"flutter-reviewer",      desc:"Flutter and Dart code reviewer. Reviews for widget best practices, state management patterns, Dart idioms, performance pitfalls, and accessibility.",tools:["Read","Grep","Glob","Bash"],model:"sonnet"},
+  {name:"fsharp-reviewer",       desc:"Expert F# code reviewer specializing in functional idioms, type safety, pattern matching, computation expressions, and performance.",tools:["Read","Grep","Glob","Bash"],model:"sonnet"},
+  {name:"gan-evaluator",         desc:"GAN Harness Evaluator agent. Tests the live running application via Playwright, scores against rubric, and provides actionable feedback to the Generator.",tools:["Read","Write","Bash","Grep","Glob"],model:"opus"},
+  {name:"gan-generator",         desc:"GAN Harness Generator agent. Implements features according to the spec, reads evaluator feedback, and iterates until quality threshold is met.",tools:["Read","Write","Edit","Bash","Grep","Glob"],model:"opus"},
+  {name:"gan-planner",           desc:"GAN Harness Planner agent. Expands a one-line prompt into a full product specification with features, sprints, evaluation criteria, and design direction.",tools:["Read","Write","Grep","Glob"],model:"opus"},
+  {name:"go-build-resolver",     desc:"Go build, vet, and compilation error resolution specialist. Fixes build errors, go vet issues, and linter warnings with minimal changes.",tools:["Read","Write","Edit","Bash","Grep","Glob"],model:"sonnet"},
+  {name:"go-reviewer",           desc:"Expert Go code reviewer specializing in idiomatic Go, concurrency patterns, error handling, and performance. MUST BE USED for Go projects.",tools:["Read","Grep","Glob","Bash"],model:"sonnet"},
+  {name:"harmonyos-app-resolver",desc:"HarmonyOS application development expert specializing in ArkTS and ArkUI. Reviews code for V2 state management compliance, Navigation routing patterns, and API usage.",tools:["Read","Write","Edit","Bash","Grep","Glob"],model:"sonnet"},
+  {name:"harness-optimizer",     desc:"Analyze and improve the local agent harness configuration for reliability, cost, and throughput.",tools:["Read","Grep","Glob","Bash","Edit"],model:"sonnet"},
+  {name:"healthcare-reviewer",   desc:"Reviews healthcare application code for clinical safety, CDSS accuracy, PHI compliance, and medical data integrity. Specialized for EMR/EHR systems.",tools:["Read","Grep","Glob"],model:"opus"},
+  {name:"homelab-architect",     desc:"Designs home and small-lab network plans from hardware inventory, goals, and operator experience level, with safe staged changes and rollback guidance.",tools:["Read","Grep"],model:"sonnet"},
+  {name:"java-build-resolver",   desc:"Java/Maven/Gradle build, compilation, and dependency error resolution specialist. Automatically detects Spring Boot or Quarkus and applies framework-specific fixes.",tools:["Read","Write","Edit","Bash","Grep","Glob"],model:"sonnet"},
+  {name:"java-reviewer",         desc:"Expert Java code reviewer for Spring Boot and Quarkus projects. Covers layered architecture, JPA/Panache, MongoDB, security, and concurrency.",tools:["Read","Grep","Glob","Bash"],model:"sonnet"},
+  {name:"kotlin-build-resolver", desc:"Kotlin/Gradle build, compilation, and dependency error resolution specialist. Fixes build errors, Kotlin compiler errors, and Gradle issues.",tools:["Read","Write","Edit","Bash","Grep","Glob"],model:"sonnet"},
+  {name:"kotlin-reviewer",       desc:"Kotlin and Android/KMP code reviewer. Reviews for idiomatic patterns, coroutine safety, Compose best practices, and clean architecture violations.",tools:["Read","Grep","Glob","Bash"],model:"sonnet"},
+  {name:"loop-operator",         desc:"Operate autonomous agent loops, monitor progress, and intervene safely when loops stall.",tools:["Read","Grep","Glob","Bash","Edit"],model:"sonnet"},
+  {name:"mle-reviewer",          desc:"Production machine-learning engineering reviewer for data contracts, feature pipelines, training reproducibility, offline/online evaluation, model serving, and monitoring.",tools:["Read","Grep","Glob","Bash"],model:"sonnet"},
+  {name:"network-architect",     desc:"Designs enterprise or multi-site network architecture from requirements, using existing network skills for focused routing, validation, automation, and troubleshooting.",tools:["Read","Grep"],model:"sonnet"},
+  {name:"network-config-reviewer",desc:"Reviews router and switch configurations for security, correctness, stale references, risky change-window commands, and missing operational guardrails.",tools:["Read","Grep"],model:"sonnet"},
+  {name:"network-troubleshooter",desc:"Diagnoses network connectivity, routing, DNS, interface, and policy symptoms with a read-only OSI-layer workflow and evidence-backed root cause summary.",tools:["Read","Bash","Grep"],model:"sonnet"},
+  {name:"opensource-forker",     desc:"Fork any project for open-sourcing. Copies files, strips secrets and credentials (20+ patterns), replaces internal references with placeholders, and cleans git history.",tools:["Read","Write","Edit","Bash","Grep","Glob"],model:"sonnet"},
+  {name:"opensource-packager",   desc:"Generate complete open-source packaging for a sanitized project. Produces CLAUDE.md, setup.sh, README.md, LICENSE, CONTRIBUTING.md, and GitHub issue templates.",tools:["Read","Write","Edit","Bash","Grep","Glob"],model:"sonnet"},
+  {name:"opensource-sanitizer",  desc:"Verify an open-source fork is fully sanitized before release. Scans for leaked secrets, PII, internal references, and dangerous files using 20+ regex patterns.",tools:["Read","Grep","Glob","Bash"],model:"sonnet"},
+  {name:"performance-optimizer", desc:"Performance analysis and optimization specialist. Use PROACTIVELY for identifying bottlenecks, optimizing slow code, reducing bundle sizes, and improving runtime performance.",tools:["Read","Write","Edit","Bash","Grep","Glob"],model:"sonnet"},
+  {name:"planner",               desc:"Expert planning specialist for complex features and refactoring. Use PROACTIVELY when users request feature implementation, architectural changes, or complex refactoring.",tools:["Read","Grep","Glob"],model:"opus"},
+  {name:"pr-test-analyzer",      desc:"Review pull request test coverage quality and completeness, with emphasis on behavioral coverage and real bug prevention.",tools:["Read","Grep","Glob","Bash"],model:"sonnet"},
+  {name:"python-reviewer",       desc:"Expert Python code reviewer specializing in PEP 8 compliance, Pythonic idioms, type hints, security, and performance. MUST BE USED for Python projects.",tools:["Read","Grep","Glob","Bash"],model:"sonnet"},
+  {name:"pytorch-build-resolver",desc:"PyTorch runtime, CUDA, and training error resolution specialist. Fixes tensor shape mismatches, device errors, gradient issues, DataLoader problems.",tools:["Read","Write","Edit","Bash","Grep","Glob"],model:"sonnet"},
+  {name:"refactor-cleaner",      desc:"Dead code cleanup and consolidation specialist. Use PROACTIVELY for removing unused code, duplicates, and refactoring. Runs analysis tools to identify dead code.",tools:["Read","Write","Edit","Bash","Grep","Glob"],model:"sonnet"},
+  {name:"rust-build-resolver",   desc:"Rust build, compilation, and dependency error resolution specialist. Fixes cargo build errors, borrow checker issues, and Cargo.toml problems.",tools:["Read","Write","Edit","Bash","Grep","Glob"],model:"sonnet"},
+  {name:"rust-reviewer",         desc:"Expert Rust code reviewer specializing in ownership, lifetimes, error handling, unsafe usage, and idiomatic patterns. MUST BE USED for Rust projects.",tools:["Read","Grep","Glob","Bash"],model:"sonnet"},
+  {name:"security-reviewer",     desc:"Security vulnerability detection and remediation specialist. Use PROACTIVELY after writing code that handles user input, authentication, or sensitive data. Flags OWASP Top 10.",tools:["Read","Write","Edit","Bash","Grep","Glob"],model:"sonnet"},
+  {name:"seo-specialist",        desc:"SEO specialist for technical SEO audits, on-page optimization, structured data, Core Web Vitals, and content/keyword mapping.",tools:["Read","Grep","Glob","WebSearch","WebFetch"],model:"sonnet"},
+  {name:"silent-failure-hunter", desc:"Review code for silent failures, swallowed errors, bad fallbacks, and missing error propagation.",tools:["Read","Grep","Glob","Bash"],model:"sonnet"},
+  {name:"swift-build-resolver",  desc:"Swift/Xcode build, compilation, and dependency error resolution specialist. Fixes swift build errors, Xcode build failures, and SPM dependency issues.",tools:["Read","Write","Edit","Bash","Grep","Glob"],model:"sonnet"},
+  {name:"swift-reviewer",        desc:"Expert Swift code reviewer specializing in protocol-oriented design, value semantics, ARC memory management, and Swift Concurrency.",tools:["Read","Grep","Glob","Bash"],model:"sonnet"},
+  {name:"tdd-guide",             desc:"Test-Driven Development specialist enforcing write-tests-first methodology. Use PROACTIVELY when writing new features, fixing bugs, or refactoring code. Ensures 80%+ test coverage.",tools:["Read","Write","Edit","Bash","Grep"],model:"sonnet"},
+  {name:"type-design-analyzer",  desc:"Analyze type design for encapsulation, invariant expression, usefulness, and enforcement.",tools:["Read","Grep","Glob"],model:"sonnet"},
+  {name:"typescript-reviewer",   desc:"Expert TypeScript/JavaScript code reviewer specializing in type safety, async correctness, Node/web security, and idiomatic patterns.",tools:["Read","Grep","Glob","Bash"],model:"sonnet"},
+];
 
-  // Counts
-  const counts = { opus:0, sonnet:0, haiku:0 };
-  AGENTS.forEach(a => counts[a.model] = (counts[a.model] || 0) + 1);
-  document.getElementById('total-count').textContent  = AGENTS.length;
-  document.getElementById('show-count').textContent   = AGENTS.length;
-  document.getElementById('opus-count').textContent   = counts.opus;
-  document.getElementById('sonnet-count').textContent = counts.sonnet;
-  document.getElementById('haiku-count').textContent  = counts.haiku || 0;
+// ═══════════════════════════════════════════════════════════════════
+// OFFICE MODULE — Canvas pixel office with walking agents
+// ═══════════════════════════════════════════════════════════════════
+const OFFICE=(()=>{
+  const W=960, H=570;
+  const S=3; // sprite scale: each "pixel" = S×S canvas pixels
+  const CW=8*S, CH=12*S; // character canvas size: 24×36
 
-  // Category counts
-  const catCounts = {};
-  AGENTS.forEach(a => {
-    const c = getCategory(a.name);
-    catCounts[c] = (catCounts[c] || 0) + 1;
-  });
+  // Room layout (2 rows × 3 cols)
+  const ROOMS=[
+    { id:'sec',    x:0,   y:0,   w:320, h:265, name:'SECURITY OPS',    bg:'#130005', border:'#ff1744', cats:['security','healthcare'] },
+    { id:'plan',   x:320, y:0,   w:320, h:265, name:'PLANNING CENTER', bg:'#090020', border:'#ce93d8', cats:['architect','planner','docs'] },
+    { id:'net',    x:640, y:0,   w:320, h:265, name:'NETWORK & GAN',   bg:'#000c1a', border:'#00e5ff', cats:['network','gan'] },
+    { id:'build',  x:0,   y:295, w:320, h:275, name:'BUILD LAB',       bg:'#140800', border:'#ff6b35', cats:['resolver'] },
+    { id:'review', x:320, y:295, w:320, h:275, name:'REVIEW WING',     bg:'#001508', border:'#00ff9d', cats:['reviewer','tester'] },
+    { id:'gen',    x:640, y:295, w:320, h:275, name:'GENERAL HQ',      bg:'#060610', border:'#40c4ff', cats:['optimizer','analyzer','operator','opensource','specialized'] },
+  ];
+  const CORRIDOR_Y=265, CORRIDOR_H=30;
 
-  // Filter buttons
-  const fg = document.getElementById('filters');
+  // Pixel-art 8×12 character sprite frames
+  // 0=transparent 1=hair 2=skin 3=eye 4=body(cat color) 5=pants 6=shoe
+  const FRAME=[
+    [ // idle
+      [0,0,1,1,1,1,0,0],
+      [0,1,2,2,2,2,1,0],
+      [0,0,2,3,2,3,0,0],
+      [0,0,2,2,2,2,0,0],
+      [0,0,2,2,2,2,0,0],
+      [4,4,4,4,4,4,4,4],
+      [0,4,4,4,4,4,4,0],
+      [0,4,4,4,4,4,4,0],
+      [0,5,5,5,5,5,5,0],
+      [0,5,5,0,0,5,5,0],
+      [0,5,5,0,0,5,5,0],
+      [0,6,6,0,0,6,6,0],
+    ],
+    [ // walk A — left foot forward
+      [0,0,1,1,1,1,0,0],
+      [0,1,2,2,2,2,1,0],
+      [0,0,2,3,2,3,0,0],
+      [0,0,2,2,2,2,0,0],
+      [0,0,2,2,2,2,0,0],
+      [4,4,4,4,4,4,4,4],
+      [0,4,4,4,4,4,4,0],
+      [0,4,4,4,4,4,4,0],
+      [0,5,5,5,5,5,5,0],
+      [5,5,5,0,0,5,0,0],
+      [0,5,0,0,0,5,5,0],
+      [6,6,0,0,0,0,6,6],
+    ],
+    [ // walk B — right foot forward
+      [0,0,1,1,1,1,0,0],
+      [0,1,2,2,2,2,1,0],
+      [0,0,2,3,2,3,0,0],
+      [0,0,2,2,2,2,0,0],
+      [0,0,2,2,2,2,0,0],
+      [4,4,4,4,4,4,4,4],
+      [0,4,4,4,4,4,4,0],
+      [0,4,4,4,4,4,4,0],
+      [0,5,5,5,5,5,5,0],
+      [0,0,5,0,0,5,5,5],
+      [0,5,5,0,0,0,5,0],
+      [6,6,0,0,0,0,6,6],
+    ],
+  ];
 
-  const allBtn = document.createElement('button');
-  allBtn.className = 'filter-btn active';
-  allBtn.dataset.cat = 'all';
-  allBtn.style.setProperty('--active-col', '#00e5ff');
-  allBtn.style.color = '#00e5ff';
-  allBtn.innerHTML = `ALL <span class="cnt">(${AGENTS.length})</span>`;
-  allBtn.addEventListener('click', () => setFilter('all', allBtn));
-  fg.appendChild(allBtn);
+  // For seated agents (at desks): upper body only, no walking legs
+  const SEATED_FRAME=[
+    [0,0,1,1,1,1,0,0],
+    [0,1,2,2,2,2,1,0],
+    [0,0,2,3,2,3,0,0],
+    [0,0,2,2,2,2,0,0],
+    [0,0,2,2,2,2,0,0],
+    [4,4,4,4,4,4,4,4],
+    [0,4,4,4,4,4,4,0],
+    [0,4,4,4,4,4,4,0],
+  ];
 
-  const usedCats = Object.keys(catCounts).sort();
-  usedCats.forEach(cat => {
-    const { label, color } = CATS[cat];
-    const btn = document.createElement('button');
-    btn.className = 'filter-btn';
-    btn.dataset.cat = cat;
-    btn.style.setProperty('--active-col', color);
-    btn.style.color = color;
-    btn.innerHTML = `${label} <span class="cnt">(${catCounts[cat]})</span>`;
-    btn.addEventListener('click', () => setFilter(cat, btn));
-    fg.appendChild(btn);
-  });
+  let canvas, ctx, agents=[], selected=null;
+  let filterQuery='', filterModel='all';
+  let tick=0;
 
-  function setFilter(cat, btn) {
-    activeCat = cat;
-    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    applyFilters();
+  // Assign each agent to a room and position within that room
+  function layoutAgents(){
+    const roomCounts={};
+    AGENTS.forEach(ag=>{
+      const cat=getCat(ag.name);
+      const room=ROOMS.find(r=>r.cats.includes(cat))||ROOMS[5];
+      roomCounts[room.id]=(roomCounts[room.id]||0);
+      const idx=roomCounts[room.id]++;
+
+      // Grid position within room
+      const margin=10, padTop=34;
+      const slotW=CW+10, slotH=CH+18;
+      const cols=Math.floor((room.w - margin*2) / slotW);
+      const col=idx%cols, row=Math.floor(idx/cols);
+      const x=room.x + margin + col*slotW;
+      const y=room.y + padTop + row*slotH;
+
+      // Walkers: first agent of each room wanders; rest are seated
+      const isWalker=idx<2;
+      const walkOffset=ag.name.length; // stagger frame offset
+
+      agents.push({ ...ag, cat, room, x, y, baseX:x, baseY:y, isWalker, walkOffset });
+    });
   }
 
-  // Search
-  document.getElementById('search').addEventListener('input', e => {
-    query = e.target.value.toLowerCase().trim();
-    applyFilters();
-  });
+  function drawChar(ctx, cx, cy, bodyColor, frameIdx, dimmed){
+    const rows=FRAME[frameIdx];
+    const C={1:'#2a1a0a',2:'#e8c49a',3:'#050310',4:bodyColor,5:'#1a0f2e',6:'#050310'};
+    ctx.globalAlpha=dimmed?0.2:1;
+    rows.forEach((row,ry)=>{
+      row.forEach((px,rx)=>{
+        if(!px)return;
+        ctx.fillStyle=C[px];
+        ctx.fillRect(cx+rx*S, cy+ry*S, S, S);
+      });
+    });
+    ctx.globalAlpha=1;
+  }
 
-  // Render cards
-  const grid = document.getElementById('grid');
-  const noResults = document.getElementById('no-results');
-  AGENTS.forEach((agent, i) => {
-    const card = buildCard(agent, i * 25);
-    grid.insertBefore(card, noResults);
-  });
-}
+  function drawSeatedChar(ctx, cx, cy, bodyColor, dimmed){
+    const C={1:'#2a1a0a',2:'#e8c49a',3:'#050310',4:bodyColor,5:'#1a0f2e'};
+    ctx.globalAlpha=dimmed?0.2:1;
+    SEATED_FRAME.forEach((row,ry)=>{
+      row.forEach((px,rx)=>{
+        if(!px)return;
+        ctx.fillStyle=C[px];
+        ctx.fillRect(cx+rx*S, cy+ry*S, S, S);
+      });
+    });
+    ctx.globalAlpha=1;
+  }
 
-document.addEventListener('DOMContentLoaded', init);
+  function drawDesk(ctx, cx, cy, color){
+    // Monitor
+    ctx.fillStyle=color+'55';
+    ctx.fillRect(cx+S, cy-7*S, 6*S, 4*S);
+    ctx.fillStyle=color+'33';
+    ctx.fillRect(cx+2*S, cy-6*S, 4*S, 2*S);
+    // Stand
+    ctx.fillStyle='#2a1f3a';
+    ctx.fillRect(cx+3*S, cy-3*S, 2*S, S);
+    // Desk surface
+    ctx.fillStyle='#2a1f14';
+    ctx.fillRect(cx-S, cy-2*S, 10*S, 2*S);
+    ctx.fillStyle='#1a1008';
+    ctx.fillRect(cx-S, cy, 10*S, S);
+  }
+
+  function drawRoom(r){
+    // Floor
+    ctx.fillStyle=r.bg;
+    ctx.fillRect(r.x, r.y, r.w, r.h);
+
+    // Subtle floor tiles
+    ctx.strokeStyle=r.border+'18';
+    ctx.lineWidth=1;
+    for(let gx=r.x;gx<r.x+r.w;gx+=16){ ctx.beginPath();ctx.moveTo(gx,r.y);ctx.lineTo(gx,r.y+r.h);ctx.stroke(); }
+    for(let gy=r.y;gy<r.y+r.h;gy+=16){ ctx.beginPath();ctx.moveTo(r.x,gy);ctx.lineTo(r.x+r.w,gy);ctx.stroke(); }
+
+    // Room border
+    ctx.strokeStyle=r.border;
+    ctx.lineWidth=2;
+    ctx.strokeRect(r.x+1, r.y+1, r.w-2, r.h-2);
+
+    // Header bar
+    ctx.fillStyle=r.border+'25';
+    ctx.fillRect(r.x+2, r.y+2, r.w-4, 26);
+    ctx.fillStyle=r.border+'50';
+    ctx.fillRect(r.x+2, r.y+28, r.w-4, 1);
+
+    // Room name
+    ctx.fillStyle=r.border;
+    ctx.font='bold 7px monospace';
+    ctx.textBaseline='middle';
+    ctx.fillText(r.name, r.x+10, r.y+15);
+
+    // Agent count badge
+    const cnt=agents.filter(a=>a.room.id===r.id).length;
+    ctx.fillStyle=r.border+'44';
+    ctx.fillRect(r.x+r.w-38, r.y+6, 30, 18);
+    ctx.fillStyle=r.border;
+    ctx.font='bold 6px monospace';
+    ctx.textAlign='center';
+    ctx.fillText('['+cnt+']', r.x+r.w-23, r.y+15);
+    ctx.textAlign='left';
+
+    // Corner plants
+    drawPlant(ctx, r.x+4, r.y+r.h-18, r.border);
+    drawPlant(ctx, r.x+r.w-14, r.y+r.h-18, r.border);
+  }
+
+  function drawPlant(ctx, x, y, color){
+    ctx.fillStyle='#1a0f06';
+    ctx.fillRect(x+2,y+8,8,6);
+    ctx.fillStyle='#003316';
+    ctx.fillRect(x+3,y+2,6,7);
+    ctx.fillRect(x,y+5,12,4);
+    ctx.fillStyle=color+'40';
+    ctx.fillRect(x+4,y+3,4,4);
+  }
+
+  function drawCorridor(){
+    ctx.fillStyle='#060410';
+    ctx.fillRect(0, CORRIDOR_Y, W, CORRIDOR_H);
+    // Corridor markings
+    ctx.strokeStyle='#2a1f4a';
+    ctx.lineWidth=1;
+    ctx.setLineDash([8,8]);
+    ctx.beginPath();
+    ctx.moveTo(0, CORRIDOR_Y+CORRIDOR_H/2);
+    ctx.lineTo(W, CORRIDOR_Y+CORRIDOR_H/2);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    // Signs
+    ctx.fillStyle='#3a2a5a';
+    ctx.font='5px monospace';
+    ctx.fillStyle='#5a4a7a';
+    ctx.fillText('◄ BUILD + REVIEW                              NETWORK + PLANNING ►', 20, CORRIDOR_Y+17);
+  }
+
+  function isVisible(ag){
+    if(filterModel!=='all' && ag.model!==filterModel) return false;
+    if(filterQuery){
+      const q=filterQuery.toLowerCase();
+      if(!ag.name.toLowerCase().includes(q) && !ag.cat.includes(q) && !ag.desc.toLowerCase().includes(q)) return false;
+    }
+    return true;
+  }
+
+  function draw(){
+    tick++;
+    ctx.fillStyle='#040310';
+    ctx.fillRect(0,0,W,H);
+
+    // Rooms
+    ROOMS.forEach(drawRoom);
+    drawCorridor();
+
+    // Agents (desks first, then characters)
+    const walkFrame = Math.floor(tick/12)%2; // switch walking frame every 12 ticks (~200ms at 60fps)
+
+    agents.forEach(ag=>{
+      const vis=isVisible(ag);
+      const cat=CATS[ag.cat];
+      const color=cat?.color||'#888888';
+
+      if(!ag.isWalker){
+        // Seated agent at desk
+        drawDesk(ctx, ag.x, ag.y, color);
+        drawSeatedChar(ctx, ag.x, ag.y, color, !vis);
+      }
+    });
+
+    agents.forEach(ag=>{
+      if(!ag.isWalker) return;
+      const vis=isVisible(ag);
+      const cat=CATS[ag.cat];
+      const color=cat?.color||'#888888';
+
+      // Walker moves in a small area around base position
+      const phaseX=ag.walkOffset*0.37;
+      const phaseY=ag.walkOffset*0.51;
+      const amplitude=18;
+      const walkX=Math.sin((tick*0.018)+phaseX)*amplitude;
+      const walkY=Math.cos((tick*0.022)+phaseY)*amplitude*0.4;
+      ag.x=ag.baseX+walkX;
+      ag.y=ag.baseY+walkY;
+
+      const moving=Math.abs(walkX-Math.sin((tick*0.018+0.018)+phaseX)*amplitude)>0.5;
+      const fIdx=moving?(walkFrame===0?1:2):0;
+      drawChar(ctx, ag.x, ag.y, color, fIdx, !vis);
+    });
+
+    // Selection highlight + floating name
+    if(selected){
+      const ag=agents.find(a=>a.name===selected);
+      if(ag){
+        const cat=CATS[ag.cat];
+        const color=cat?.color||'#888888';
+        // Glow box
+        ctx.strokeStyle=color;
+        ctx.lineWidth=2;
+        ctx.shadowBlur=8;
+        ctx.shadowColor=color;
+        ctx.strokeRect(ag.x-2, ag.y-2, CW+4, (ag.isWalker?CH:8*S)+4);
+        ctx.shadowBlur=0;
+        // Floating name tag
+        const label=ag.name.length>14?ag.name.slice(0,13)+'…':ag.name;
+        ctx.fillStyle='rgba(8,5,16,0.9)';
+        ctx.fillRect(ag.x-2, ag.y-14, label.length*5+8, 12);
+        ctx.fillStyle=color;
+        ctx.font='bold 6px monospace';
+        ctx.fillText(label, ag.x+2, ag.y-5);
+      }
+    }
+  }
+
+  function getAgentAt(mx, my){
+    for(const ag of agents){
+      const h=ag.isWalker?CH:8*S;
+      if(mx>=ag.x && mx<ag.x+CW && my>=ag.y && my<ag.y+h) return ag;
+    }
+    return null;
+  }
+
+  function showInfo(ag){
+    const cat=CATS[ag.cat];
+    const color=cat?.color||'#888888';
+    $('agent-info').style.setProperty('--info-col',color);
+    $('info-name').textContent=ag.name;
+    $('info-cat').textContent='[ '+cat.label+' ]';
+    $('info-desc').textContent=ag.desc.length>180?ag.desc.slice(0,178)+'…':ag.desc;
+    $('info-tools').innerHTML=ag.tools.map(t=>`<span class="info-tool">${t}</span>`).join('');
+    const mc={opus:'var(--opus)',sonnet:'var(--sonnet)',haiku:'var(--haiku)'};
+    $('info-model').innerHTML=`<span style="color:${mc[ag.model]||'#fff'}">${ag.model.toUpperCase()}</span>`;
+    $('agent-info').classList.add('visible');
+  }
+
+  function onCanvasClick(e){
+    const rect=canvas.getBoundingClientRect();
+    const scaleX=W/rect.width;
+    const mx=(e.clientX-rect.left)*scaleX;
+    const my=(e.clientY-rect.top)*scaleX;
+    const hit=getAgentAt(mx,my);
+    selected=hit?hit.name:null;
+    if(hit) showInfo(hit);
+    else $('agent-info').classList.remove('visible');
+  }
+
+  function onCanvasHover(e){
+    const rect=canvas.getBoundingClientRect();
+    const scaleX=W/rect.width;
+    const mx=(e.clientX-rect.left)*scaleX;
+    const my=(e.clientY-rect.top)*scaleX;
+    canvas.style.cursor=getAgentAt(mx,my)?'pointer':'default';
+  }
+
+  function animate(){
+    draw();
+    requestAnimationFrame(animate);
+  }
+
+  return{
+    init(){
+      canvas=$('office-canvas');
+      canvas.width=W; canvas.height=H;
+      ctx=canvas.getContext('2d');
+      layoutAgents();
+
+      // Counts
+      const cnt={opus:0,sonnet:0,haiku:0};
+      AGENTS.forEach(a=>cnt[a.model]=(cnt[a.model]||0)+1);
+      $('total-count').textContent=AGENTS.length;
+      $('badge-office').textContent=AGENTS.length;
+      $('opus-cnt').textContent=cnt.opus;
+      $('sonnet-cnt').textContent=cnt.sonnet;
+      $('haiku-cnt').textContent=cnt.haiku||0;
+
+      canvas.addEventListener('click',onCanvasClick);
+      canvas.addEventListener('mousemove',onCanvasHover);
+
+      // Search
+      $('search').addEventListener('input',e=>{ filterQuery=e.target.value.trim(); });
+
+      // Model filter buttons
+      $('model-filters').querySelectorAll('.filter-btn').forEach(b=>{
+        b.addEventListener('click',()=>{
+          filterModel=b.dataset.model;
+          $('model-filters').querySelectorAll('.filter-btn').forEach(x=>x.classList.remove('active'));
+          b.classList.add('active');
+        });
+      });
+
+      animate();
+    },
+    deselect(){
+      selected=null;
+      $('agent-info').classList.remove('visible');
+    }
+  };
+})();
+
+// ═══════════════════════════════════════════════════════════════════
+// CRM MODULE
+// ═══════════════════════════════════════════════════════════════════
+const CRM={
+  STAGES:[
+    {id:'LEAD',label:'LEAD',color:'#5a4a7a'},{id:'QUALIFIED',label:'QUALIFIED',color:'#4fc3f7'},
+    {id:'PROPOSAL',label:'PROPOSAL',color:'#ce93d8'},{id:'NEGOTIATION',label:'NEGOTIATION',color:'#ffab40'},
+    {id:'WON',label:'WON',color:'#69f0ae'},{id:'LOST',label:'LOST',color:'#ff1744'},
+  ],
+  get data(){ return Store.get('crm')||{contacts:[]}; },
+  save(d){ Store.set('crm',d); this.render(); $('badge-crm').textContent=d.contacts.length; },
+  render(){
+    const d=this.data, q=$('crm-search').value.toLowerCase();
+    const cs=d.contacts.filter(c=>!q||c.name.toLowerCase().includes(q)||(c.company||'').toLowerCase().includes(q));
+    const won=cs.filter(c=>c.stage==='WON').length;
+    const pipe=cs.filter(c=>!['WON','LOST'].includes(c.stage)).reduce((s,c)=>s+(c.value||0),0);
+    $('crm-stats').innerHTML=`
+      <div class="crm-stat"><span class="sv">${cs.length}</span><span class="sl">CONTACTS</span></div>
+      <div class="crm-stat"><span class="sv" style="color:#69f0ae">${won}</span><span class="sl">WON</span></div>
+      <div class="crm-stat"><span class="sv">€${fmtM(pipe)}</span><span class="sl">PIPELINE</span></div>
+      <div class="crm-stat"><span class="sv" style="color:#ffab40">${cs.filter(c=>c.stage==='NEGOTIATION').length}</span><span class="sl">NEGOTIATING</span></div>`;
+    $('crm-pipeline').innerHTML=this.STAGES.map(st=>{
+      const cards=cs.filter(c=>c.stage===st.id);
+      return`<div class="stage-col" style="--sc:${st.color}">
+        <div class="stage-head"><span class="stage-name">${st.label}</span><span class="stage-cnt">${cards.length}</span></div>
+        <div class="stage-cards">${cards.map(c=>`
+          <div class="contact-card" onclick="CRM.showModal('${c.id}')">
+            <div class="cc-name">${esc(c.name)}</div>
+            <div class="cc-co">${esc(c.company||'—')}</div>
+            ${c.value?`<div class="cc-val">€${fmtM(c.value)}</div>`:''}
+            <button class="cc-del" onclick="event.stopPropagation();CRM.del('${c.id}')">✕</button>
+          </div>`).join('')}</div></div>`;
+    }).join('');
+  },
+  showModal(id=null){
+    const d=this.data, c=id?d.contacts.find(x=>x.id===id):null;
+    const sOpts=this.STAGES.map(s=>`<option value="${s.id}" ${(c?.stage||'LEAD')===s.id?'selected':''}>${s.label}</option>`).join('');
+    Modal.open(c?'EDIT CONTACT':'NEW CONTACT',
+      `<div class="f2"><div class="fg"><label class="fl">NAME *</label><input class="fi" id="f-name" value="${esc(c?.name)}" placeholder="John Doe"></div>
+       <div class="fg"><label class="fl">COMPANY</label><input class="fi" id="f-co" value="${esc(c?.company)}" placeholder="Acme Corp"></div></div>
+       <div class="f2"><div class="fg"><label class="fl">EMAIL</label><input class="fi" id="f-em" type="email" value="${esc(c?.email)}" placeholder="john@acme.com"></div>
+       <div class="fg"><label class="fl">PHONE</label><input class="fi" id="f-ph" value="${esc(c?.phone)}" placeholder="+34 600 000 000"></div></div>
+       <div class="f2"><div class="fg"><label class="fl">STAGE</label><select class="fs" id="f-st">${sOpts}</select></div>
+       <div class="fg"><label class="fl">VALUE (€)</label><input class="fi" id="f-val" type="number" value="${c?.value||''}" placeholder="0"></div></div>
+       <div class="fg"><label class="fl">NOTES</label><textarea class="fta" id="f-notes" placeholder="Notes...">${esc(c?.notes)}</textarea></div>`,
+      `<button class="px-btn" onclick="Modal.close()">CANCEL</button><button class="px-btn crm" onclick="CRM.saveForm('${id||''}')">${c?'UPDATE':'ADD'}</button>`,
+      '#ce93d8');
+  },
+  saveForm(id){
+    const name=$('f-name').value.trim();
+    if(!name){$('f-name').style.borderColor='#ff1744';$('f-name').focus();return;}
+    const d=this.data;
+    const contact={id:id||UID(),name,company:$('f-co').value.trim(),email:$('f-em').value.trim(),phone:$('f-ph').value.trim(),stage:$('f-st').value,value:parseInt($('f-val').value)||0,notes:$('f-notes').value.trim(),createdAt:id?(d.contacts.find(x=>x.id===id)?.createdAt||new Date().toISOString()):new Date().toISOString()};
+    if(id) d.contacts=d.contacts.map(c=>c.id===id?contact:c); else d.contacts.push(contact);
+    this.save(d); Modal.close();
+  },
+  del(id){ const d=this.data; d.contacts=d.contacts.filter(c=>c.id!==id); this.save(d); },
+  init(){ this.render(); $('badge-crm').textContent=this.data.contacts.length; $('crm-search').addEventListener('input',()=>this.render()); }
+};
+
+// ═══════════════════════════════════════════════════════════════════
+// KANBAN MODULE
+// ═══════════════════════════════════════════════════════════════════
+const KANBAN={
+  COLS:[{id:'BACKLOG',label:'BACKLOG',color:'#5a4a7a'},{id:'TODO',label:'TO DO',color:'#4fc3f7'},{id:'IN_PROGRESS',label:'IN PROGRESS',color:'#fff176'},{id:'DONE',label:'DONE',color:'#69f0ae'}],
+  dragging:null,
+  get data(){ return Store.get('kanban')||{projects:[{id:'default',name:'VIRTUAL OFFICE',cards:[]}],active:'default'}; },
+  save(d){ Store.set('kanban',d); this.render(); const t=d.projects.reduce((s,p)=>s+p.cards.length,0); $('badge-kanban').textContent=t; },
+  activeProj(){ const d=this.data; return d.projects.find(p=>p.id===d.active)||d.projects[0]; },
+  renderProjTabs(){
+    const d=this.data;
+    $('proj-tabs').innerHTML=d.projects.map(p=>`<button class="proj-tab ${p.id===d.active?'active':''}" onclick="KANBAN.setActive('${p.id}')">${esc(p.name)}</button>`).join('')
+      +`<button class="px-btn sm" onclick="KANBAN.showAddProj()" style="--bc:#fff176">+ PROJECT</button>`;
+  },
+  setActive(id){ const d=this.data; d.active=id; this.save(d); },
+  render(){
+    this.renderProjTabs();
+    const proj=this.activeProj(); if(!proj)return;
+    $('board').innerHTML=this.COLS.map(col=>{
+      const cards=proj.cards.filter(c=>c.column===col.id);
+      return`<div class="board-col" style="--cc2:${col.color}" data-col="${col.id}"
+               ondragover="KANBAN.onDragOver(event)" ondrop="KANBAN.onDrop(event,'${col.id}')"
+               ondragleave="this.classList.remove('drag-over')">
+              <div class="col-head"><span class="col-name">${col.label}</span><span class="col-cnt">${cards.length}</span></div>
+              <div class="board-cards" id="col-${col.id}">${cards.map(card=>`
+                <div class="kb-card" draggable="true" data-id="${card.id}"
+                     ondragstart="KANBAN.onDragStart(event,'${card.id}')" ondragend="KANBAN.onDragEnd(event)">
+                  <div class="kb-title">${esc(card.title)}</div>
+                  ${card.desc?`<div class="kb-desc">${esc(card.desc)}</div>`:''}
+                  <div class="kb-foot">
+                    <span class="pri-badge p-${card.priority}">${card.priority}</span>
+                    <div class="kb-actions">
+                      <button class="act-btn" onclick="event.stopPropagation();KANBAN.showModal('${card.id}')">✎</button>
+                      <button class="act-btn del" onclick="event.stopPropagation();KANBAN.delCard('${card.id}')">✕</button>
+                    </div>
+                  </div>
+                </div>`).join('')}</div>
+              <button class="px-btn col-add" style="--bc:${col.color};font-size:4.5px" onclick="KANBAN.showModal(null,'${col.id}')">+ ADD</button>
+             </div>`;
+    }).join('');
+  },
+  onDragStart(e,id){ this.dragging=id; e.currentTarget.classList.add('dragging'); e.dataTransfer.effectAllowed='move'; },
+  onDragEnd(e){ e.currentTarget.classList.remove('dragging'); document.querySelectorAll('.board-col').forEach(c=>c.classList.remove('drag-over')); },
+  onDragOver(e){ e.preventDefault(); e.currentTarget.classList.add('drag-over'); },
+  onDrop(e,colId){
+    e.preventDefault(); e.currentTarget.classList.remove('drag-over');
+    if(!this.dragging)return;
+    const d=this.data, proj=d.projects.find(p=>p.id===d.active), card=proj.cards.find(c=>c.id===this.dragging);
+    if(card) card.column=colId;
+    this.dragging=null; this.save(d);
+  },
+  showModal(id=null,defCol='TODO'){
+    const d=this.data, proj=this.activeProj(), card=id?proj.cards.find(c=>c.id===id):null;
+    const cOpts=this.COLS.map(c=>`<option value="${c.id}" ${(card?.column||defCol)===c.id?'selected':''}>${c.label}</option>`).join('');
+    const pOpts=['LOW','MED','HIGH','CRIT'].map(p=>`<option value="${p}" ${(card?.priority||'MED')===p?'selected':''}>${p}</option>`).join('');
+    Modal.open(card?'EDIT CARD':'NEW CARD',
+      `<div class="fg"><label class="fl">TITLE *</label><input class="fi" id="k-title" value="${esc(card?.title)}" placeholder="Task title..."></div>
+       <div class="fg"><label class="fl">DESCRIPTION</label><textarea class="fta" id="k-desc" placeholder="Details...">${esc(card?.desc)}</textarea></div>
+       <div class="f2"><div class="fg"><label class="fl">COLUMN</label><select class="fs" id="k-col">${cOpts}</select></div>
+       <div class="fg"><label class="fl">PRIORITY</label><select class="fs" id="k-pri">${pOpts}</select></div></div>`,
+      `<button class="px-btn" onclick="Modal.close()">CANCEL</button><button class="px-btn kb" onclick="KANBAN.saveCard('${id||''}')">${card?'UPDATE':'ADD'}</button>`,
+      '#fff176');
+  },
+  saveCard(id){
+    const title=$('k-title').value.trim(); if(!title){$('k-title').style.borderColor='#ff1744';$('k-title').focus();return;}
+    const d=this.data, proj=d.projects.find(p=>p.id===d.active);
+    const card={id:id||UID(),title,desc:$('k-desc').value.trim(),column:$('k-col').value,priority:$('k-pri').value,createdAt:id?(proj.cards.find(c=>c.id===id)?.createdAt||new Date().toISOString()):new Date().toISOString()};
+    if(id) proj.cards=proj.cards.map(c=>c.id===id?card:c); else proj.cards.push(card);
+    this.save(d); Modal.close();
+  },
+  delCard(id){ const d=this.data, proj=d.projects.find(p=>p.id===d.active); proj.cards=proj.cards.filter(c=>c.id!==id); this.save(d); },
+  showAddProj(){
+    Modal.open('NEW PROJECT',`<div class="fg"><label class="fl">PROJECT NAME *</label><input class="fi" id="p-name" placeholder="My Project"></div>`,
+      `<button class="px-btn" onclick="Modal.close()">CANCEL</button><button class="px-btn kb" onclick="KANBAN.addProj()">CREATE</button>`,'#fff176');
+  },
+  addProj(){ const name=$('p-name').value.trim().toUpperCase(); if(!name)return; const d=this.data, id=UID(); d.projects.push({id,name,cards:[]}); d.active=id; this.save(d); Modal.close(); },
+  init(){ this.render(); $('badge-kanban').textContent=this.data.projects.reduce((s,p)=>s+p.cards.length,0); }
+};
+
+// ═══════════════════════════════════════════════════════════════════
+// INBOX MODULE
+// ═══════════════════════════════════════════════════════════════════
+const INBOX={
+  folder:'INBOX', selected:null,
+  get data(){ return Store.get('inbox')||{messages:[]}; },
+  save(d){ Store.set('inbox',d); this.render(); this.updateBadge(d); },
+  updateBadge(d){ d=d||this.data; const u=d.messages.filter(m=>m.folder==='INBOX'&&!m.read).length; $('badge-inbox').textContent=u||d.messages.filter(m=>m.folder==='INBOX').length||'0'; },
+  render(){ this.renderFolders(); this.renderList(); },
+  renderFolders(){
+    const d=this.data;
+    $('inbox-folders').innerHTML=['INBOX','DRAFTS','SENT'].map(f=>{
+      const tot=d.messages.filter(m=>m.folder===f).length, unr=d.messages.filter(m=>m.folder===f&&!m.read).length;
+      return`<button class="folder-btn ${this.folder===f?'active':''}" onclick="INBOX.setFolder('${f}')">${f}${(f==='INBOX'?unr:tot)?`<span class="f-badge">${f==='INBOX'?unr:tot}</span>`:''}</button>`;
+    }).join('');
+  },
+  renderList(){
+    const d=this.data, msgs=d.messages.filter(m=>m.folder===this.folder).sort((a,b)=>new Date(b.date)-new Date(a.date));
+    $('msg-list').innerHTML=msgs.length?msgs.map(m=>`
+      <div class="msg-row ${!m.read?'unread':''} ${this.selected===m.id?'active':''}" onclick="INBOX.select('${m.id}')">
+        <div class="mr-from">${m.priority!=='NORMAL'?`<span class="mr-pri pri-${m.priority}">${m.priority}</span>`:''} ${esc(this.folder==='SENT'?m.to:m.from)}</div>
+        <div class="mr-sub">${esc(m.subject)}</div>
+        <div class="mr-date">${fmtD(m.date)}</div>
+      </div>`).join(''):`<div style="padding:20px;text-align:center;color:var(--dim);font-size:5px;line-height:3">NO MESSAGES</div>`;
+  },
+  renderView(id){
+    const m=this.data.messages.find(x=>x.id===id);
+    if(!m){$('inbox-right').innerHTML='<div class="msg-empty">&gt; NOT FOUND</div>';return;}
+    $('inbox-right').innerHTML=`
+      <div class="mv-head"><div class="mv-sub">${esc(m.subject)}</div>
+        <div class="mv-meta">FROM: ${esc(m.from||'—')}<br>TO: ${esc(m.to||'—')}<br>DATE: ${fmtD(m.date)}${m.priority!=='NORMAL'?`<br>PRIORITY: <span style="color:#ffab40">${m.priority}</span>`:''}</div></div>
+      <div class="mv-body">${esc(m.body||'(no content)')}</div>
+      <div class="mv-foot">
+        <button class="px-btn mail sm" onclick="INBOX.reply('${m.id}')">↩ REPLY</button>
+        <button class="px-btn danger sm" onclick="INBOX.del('${m.id}')">✕ DELETE</button>
+        ${!m.read?`<button class="px-btn sm" onclick="INBOX.markRead('${m.id}')">✓ READ</button>`:''}
+      </div>`;
+  },
+  setFolder(f){ this.folder=f; this.selected=null; this.render(); $('inbox-right').innerHTML='<div class="msg-empty">&gt; SELECT A MESSAGE</div>'; },
+  select(id){
+    this.selected=id;
+    const d=this.data, m=d.messages.find(x=>x.id===id);
+    if(m&&!m.read){m.read=true;this.save(d);} else this.render();
+    this.renderView(id);
+  },
+  markRead(id){ const d=this.data, m=d.messages.find(x=>x.id===id); if(m){m.read=true;this.save(d);} },
+  del(id){ const d=this.data; d.messages=d.messages.filter(m=>m.id!==id); if(this.selected===id){this.selected=null;$('inbox-right').innerHTML='<div class="msg-empty">&gt; SELECT A MESSAGE</div>';} this.save(d); },
+  reply(id){ const m=this.data.messages.find(x=>x.id===id); if(m)this.showCompose({to:m.from,subject:'RE: '+m.subject}); },
+  showCompose(def={}){
+    const pOpts=['NORMAL','HIGH','URGENT'].map(p=>`<option value="${p}" ${(def.priority||'NORMAL')===p?'selected':''}>${p}</option>`).join('');
+    Modal.open('COMPOSE MESSAGE',
+      `<div class="fg"><label class="fl">TO *</label><input class="fi" id="m-to" value="${esc(def.to)}" placeholder="recipient@example.com"></div>
+       <div class="f2"><div class="fg"><label class="fl">SUBJECT *</label><input class="fi" id="m-sub" value="${esc(def.subject)}" placeholder="Subject..."></div>
+       <div class="fg"><label class="fl">PRIORITY</label><select class="fs" id="m-pri">${pOpts}</select></div></div>
+       <div class="fg"><label class="fl">MESSAGE</label><textarea class="fta" id="m-body" placeholder="Write your message..." style="min-height:110px">${esc(def.body)}</textarea></div>`,
+      `<button class="px-btn sm" onclick="INBOX.saveDraft()">DRAFT</button><button class="px-btn" onclick="Modal.close()">CANCEL</button><button class="px-btn mail sm" onclick="INBOX.send()">✉ SEND</button>`,
+      '#69f0ae');
+  },
+  _buildMsg(folder){
+    const to=$('m-to').value.trim(), subject=$('m-sub').value.trim();
+    if(!to||!subject){ (to?$('m-sub'):$('m-to')).style.borderColor='#ff1744'; (to?$('m-sub'):$('m-to')).focus(); return null; }
+    return{id:UID(),folder,from:'me@pixeloffice.dev',to,subject,body:$('m-body').value,priority:$('m-pri').value,date:new Date().toISOString(),read:true};
+  },
+  send(){ const msg=this._buildMsg('SENT'); if(!msg)return; const d=this.data; d.messages.push(msg); this.folder='SENT'; this.save(d); Modal.close(); },
+  saveDraft(){ const msg=this._buildMsg('DRAFTS'); if(!msg)return; const d=this.data; d.messages.push(msg); this.folder='DRAFTS'; this.save(d); Modal.close(); },
+  init(){ this.render(); this.updateBadge(); }
+};
+
+// ═══════════════════════════════════════════════════════════════════
+// BOOT
+// ═══════════════════════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded',()=>{
+  initStars();
+  OFFICE.init();
+  CRM.init();
+  KANBAN.init();
+  INBOX.init();
+});
 </script>
 </body>
 </html>
