@@ -713,6 +713,22 @@ const OFFICE=(()=>{
       drawChar(ctx, ag.x, ag.y, color, fIdx, !vis);
     });
 
+    // Hover tooltip (when not selected)
+    if(hovered && hovered!==selected){
+      const ag=agents.find(a=>a.name===hovered);
+      if(ag){
+        const color=CATS[ag.cat]?.color||'#888888';
+        const label=ag.name.length>16?ag.name.slice(0,15)+'…':ag.name;
+        ctx.globalAlpha=0.85;
+        ctx.fillStyle='rgba(8,5,16,0.9)';
+        ctx.fillRect(ag.x-2, ag.y-14, label.length*5+8, 12);
+        ctx.globalAlpha=1;
+        ctx.fillStyle=color;
+        ctx.font='6px monospace';
+        ctx.fillText(label, ag.x+2, ag.y-5);
+      }
+    }
+
     // Selection highlight + floating name
     if(selected){
       const ag=agents.find(a=>a.name===selected);
@@ -769,12 +785,15 @@ const OFFICE=(()=>{
     else $('agent-info').classList.remove('visible');
   }
 
+  let hovered=null;
   function onCanvasHover(e){
     const rect=canvas.getBoundingClientRect();
     const scaleX=W/rect.width;
     const mx=(e.clientX-rect.left)*scaleX;
     const my=(e.clientY-rect.top)*scaleX;
-    canvas.style.cursor=getAgentAt(mx,my)?'pointer':'default';
+    const hit=getAgentAt(mx,my);
+    hovered=hit?hit.name:null;
+    canvas.style.cursor=hit?'pointer':'default';
   }
 
   function animate(){
@@ -1030,9 +1049,66 @@ const INBOX={
 };
 
 // ═══════════════════════════════════════════════════════════════════
+// SEED DATA (runs once on first visit)
+// ═══════════════════════════════════════════════════════════════════
+function seedIfEmpty(){
+  if(!Store.get('crm')){
+    Store.set('crm',{contacts:[
+      {id:'c1',name:'Aria Chen',company:'NovaTech Labs',email:'aria@novatech.io',phone:'+1 415 000 0001',stage:'QUALIFIED',value:24000,notes:'Interested in full TypeScript stack review',createdAt:'2026-05-01T10:00:00Z'},
+      {id:'c2',name:'Marcus Reeves',company:'Stackify SL',email:'mreeves@stackify.es',phone:'+34 600 000 002',stage:'PROPOSAL',value:48000,notes:'Wants quarterly security scans + code reviews',createdAt:'2026-05-05T09:00:00Z'},
+      {id:'c3',name:'Yuki Tanaka',company:'Bytecroft GmbH',email:'yuki@bytecroft.de',phone:'+49 160 0000003',stage:'NEGOTIATION',value:72000,notes:'Enterprise plan — needs SLA definition',createdAt:'2026-04-20T14:30:00Z'},
+      {id:'c4',name:'Sofía Morales',company:'Acme Digital',email:'sofia@acmedigital.com',phone:'+34 699 000 004',stage:'WON',value:15000,notes:'Signed 6-month retainer',createdAt:'2026-04-01T08:00:00Z'},
+      {id:'c5',name:'Liam Okafor',company:'Pixel Systems',email:'l.okafor@pixelsys.io',phone:'+44 7700 000005',stage:'LEAD',value:0,notes:'Contacted via GitHub, evaluating options',createdAt:'2026-05-18T11:00:00Z'},
+      {id:'c6',name:'Emma Larsson',company:'Nordic Clouds AB',email:'emma@nordiclouds.se',phone:'+46 70 000 0006',stage:'LOST',value:30000,notes:'Went with competitor, revisit Q4',createdAt:'2026-03-15T16:00:00Z'},
+    ]});
+  }
+
+  if(!Store.get('kanban')){
+    Store.set('kanban',{active:'p1',projects:[
+      {id:'p1',name:'VIRTUAL OFFICE',cards:[
+        {id:'k1',title:'Set up CI/CD pipeline',desc:'Configure GitHub Actions for automated testing and deployment on every push to main.',column:'DONE',priority:'HIGH',createdAt:'2026-05-01T08:00:00Z'},
+        {id:'k2',title:'Design pixel-art agent sprites',desc:'Create 8×12 sprite frames for idle and walking animations.',column:'DONE',priority:'MED',createdAt:'2026-05-03T10:00:00Z'},
+        {id:'k3',title:'Implement CRM pipeline',desc:'Drag-free stage columns with contact cards and deal values.',column:'DONE',priority:'HIGH',createdAt:'2026-05-05T09:00:00Z'},
+        {id:'k4',title:'Add Kanban drag-and-drop',desc:'Enable card dragging between columns across all projects.',column:'DONE',priority:'MED',createdAt:'2026-05-07T11:00:00Z'},
+        {id:'k5',title:'Inbox multi-folder support',desc:'Support INBOX, DRAFTS, and SENT folders with read/unread tracking.',column:'IN_PROGRESS',priority:'HIGH',createdAt:'2026-05-10T13:00:00Z'},
+        {id:'k6',title:'Keyboard shortcuts',desc:'Add Ctrl+K to open search, Escape to close modals, 1-4 to switch tabs.',column:'TODO',priority:'MED',createdAt:'2026-05-14T09:00:00Z'},
+        {id:'k7',title:'Dark mode color themes',desc:'Allow users to switch between different room color palettes.',column:'TODO',priority:'LOW',createdAt:'2026-05-15T10:00:00Z'},
+        {id:'k8',title:'Agent tooltip on hover',desc:'Show agent name tag above sprite on hover without click.',column:'BACKLOG',priority:'LOW',createdAt:'2026-05-17T14:00:00Z'},
+        {id:'k9',title:'Export CRM to CSV',desc:'Add export button in CRM header to download all contacts.',column:'BACKLOG',priority:'MED',createdAt:'2026-05-18T10:00:00Z'},
+      ]},
+      {id:'p2',name:'CLIENT PORTAL',cards:[
+        {id:'k10',title:'Auth & onboarding flow',desc:'JWT-based login with role selection and welcome wizard.',column:'IN_PROGRESS',priority:'CRIT',createdAt:'2026-05-12T08:00:00Z'},
+        {id:'k11',title:'Dashboard overview page',desc:'Show active projects, recent messages, and pipeline health at a glance.',column:'TODO',priority:'HIGH',createdAt:'2026-05-13T09:00:00Z'},
+        {id:'k12',title:'Notification system',desc:'Real-time toasts for new messages and stage changes.',column:'BACKLOG',priority:'MED',createdAt:'2026-05-16T10:00:00Z'},
+      ]},
+    ]});
+  }
+
+  if(!Store.get('inbox')){
+    Store.set('inbox',{messages:[
+      {id:'m1',folder:'INBOX',from:'yuki@bytecroft.de',to:'me@pixeloffice.dev',subject:'Re: Enterprise SLA Proposal',body:'Hi,\n\nThanks for the updated proposal. The 99.5% uptime SLA looks good. We do need clarification on the incident response time — can you confirm P1 tickets are addressed within 2 hours?\n\nAlso, the monthly review cadence works well for us.\n\nBest,\nYuki',priority:'HIGH',date:'2026-05-21T08:15:00Z',read:false},
+      {id:'m2',folder:'INBOX',from:'mreeves@stackify.es',to:'me@pixeloffice.dev',subject:'Q2 Security Audit Schedule',body:'Hey,\n\nCan we schedule the Q2 security audit for the week of June 9th? We\'ll need access to the staging environment.\n\nAlso attaching the list of microservices to audit — 14 services in total, mostly Go and TypeScript.\n\nLet me know.\nMarcus',priority:'NORMAL',date:'2026-05-20T16:40:00Z',read:false},
+      {id:'m3',folder:'INBOX',from:'aria@novatech.io',to:'me@pixeloffice.dev',subject:'TypeScript reviewer — quick question',body:'Hello,\n\nWe\'re evaluating whether the typescript-reviewer agent supports projects using Bun as a runtime instead of Node. Do you have any examples or notes on this?\n\nAlso — does it handle .d.ts declaration files in the review?\n\nThanks,\nAria',priority:'NORMAL',date:'2026-05-19T11:00:00Z',read:true},
+      {id:'m4',folder:'INBOX',from:'l.okafor@pixelsys.io',to:'me@pixeloffice.dev',subject:'Initial contact — agent services',body:'Hi there,\n\nI found your profile through GitHub and I\'m interested in your AI agent review services. We have a Rust + React project that could use a thorough audit.\n\nWould love to schedule a quick call this week if possible.\n\nBest,\nLiam Okafor\nPixel Systems',priority:'URGENT',date:'2026-05-21T07:05:00Z',read:false},
+      {id:'m5',folder:'SENT',from:'me@pixeloffice.dev',to:'sofia@acmedigital.com',subject:'Welcome aboard! Retainer confirmed',body:'Hi Sofía,\n\nGreat news — the 6-month retainer is now active. Your first monthly code review is scheduled for June 3rd.\n\nYour dedicated agents for this engagement:\n- code-reviewer (monthly deep dive)\n- security-reviewer (quarterly scan)\n- typescript-reviewer (on every PR)\n\nDon\'t hesitate to reach out anytime.\n\nBest,\nPixel Office Team',priority:'NORMAL',date:'2026-05-15T14:00:00Z',read:true},
+      {id:'m6',folder:'DRAFTS',from:'me@pixeloffice.dev',to:'emma@nordiclouds.se',subject:'Following up — Q4 availability',body:'Hi Emma,\n\nHoping this finds you well. We\'d love to reconnect as we approach Q4. We\'ve added several new agents since we last spoke, including network-architect and homelab-architect.\n\nWould a short call make sense in October?',priority:'NORMAL',date:'2026-05-20T10:00:00Z',read:true},
+    ]});
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════
 // BOOT
 // ═══════════════════════════════════════════════════════════════════
+document.addEventListener('keydown',e=>{
+  if(e.target.matches('input,textarea,select')) return;
+  const map={'1':'office','2':'crm','3':'kanban','4':'inbox'};
+  if(map[e.key]) switchTab(map[e.key]);
+  if(e.key==='Escape') Modal.close();
+  if((e.ctrlKey||e.metaKey)&&e.key==='k'){ e.preventDefault(); switchTab('office'); setTimeout(()=>$('search').focus(),80); }
+});
+
 document.addEventListener('DOMContentLoaded',()=>{
+  seedIfEmpty();
   initStars();
   OFFICE.init();
   CRM.init();
