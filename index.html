@@ -115,7 +115,7 @@
     .kb-card{background:var(--bg3);border:1px solid var(--border);padding:9px;cursor:grab;transition:border-color .15s,opacity .1s;position:relative}
     .kb-card:active{cursor:grabbing} .kb-card.dragging{opacity:.35} .kb-card:hover{border-color:var(--mod-kanban)}
     .kb-title{font-size:5.5px;color:var(--text);margin-bottom:5px;line-height:1.6}
-    .kb-desc{font-size:4.5px;color:var(--dim);margin-bottom:7px;line-height:1.8;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+    .kb-desc{font-size:4.5px;color:var(--dim);margin-bottom:7px;line-height:1.8;display:-webkit-box;-webkit-line-clamp:2;line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
     .kb-foot{display:flex;justify-content:space-between;align-items:center}
     .pri-badge{font-size:4px;padding:2px 4px;font-family:'Press Start 2P',monospace}
     .p-LOW{background:#69f0ae;color:#080510} .p-MED{background:#fff176;color:#080510} .p-HIGH{background:#ffab40;color:#080510} .p-CRIT{background:#ff1744;color:#fff}
@@ -199,6 +199,7 @@
         <span>OPUS: <b style="color:var(--opus)" id="opus-cnt">0</b></span>
         <span>SONNET: <b style="color:var(--sonnet)" id="sonnet-cnt">0</b></span>
         <span>HAIKU: <b style="color:var(--haiku)" id="haiku-cnt">0</b></span>
+        <span id="live-indicator" style="display:none;color:#00ff9d;animation:blink 1s step-end infinite">● <span id="live-cnt">0</span> WORKING</span>
         <span id="hint-txt" style="color:var(--dim)">CLICK AN AGENT TO INSPECT</span>
       </div>
       <div style="display:flex;gap:9px;flex-wrap:wrap;align-items:center">
@@ -519,6 +520,24 @@ const OFFICE=(()=>{
   let canvas, ctx, agents=[], selected=null;
   let filterQuery='', filterModel='all';
   let tick=0;
+  let liveAgents=new Set(), liveMode=false;
+
+  async function pollActive(){
+    try{
+      const r=await fetch('active.json?t='+Date.now());
+      if(r.ok){
+        const d=await r.json();
+        const now=Date.now();
+        const fresh=(d.active||[]).filter(a=>now-(a.since||0)<600000);
+        liveAgents=new Set(fresh.map(a=>a.type));
+        liveMode=liveAgents.size>0;
+        $('live-indicator').style.display=liveMode?'inline':'none';
+        $('live-cnt').textContent=liveAgents.size;
+        $('hint-txt').style.display=liveMode?'none':'inline';
+      }
+    }catch{ liveMode=false; liveAgents=new Set(); $('live-indicator').style.display='none'; $('hint-txt').style.display='inline'; }
+    setTimeout(pollActive,1500);
+  }
 
   // Assign each agent to a room and position within that room
   function layoutAgents(){
@@ -661,6 +680,7 @@ const OFFICE=(()=>{
   }
 
   function isVisible(ag){
+    if(liveMode) return liveAgents.has(ag.name);
     if(filterModel!=='all' && ag.model!==filterModel) return false;
     if(filterQuery){
       const q=filterQuery.toLowerCase();
@@ -712,6 +732,48 @@ const OFFICE=(()=>{
       const fIdx=moving?(walkFrame===0?1:2):0;
       drawChar(ctx, ag.x, ag.y, color, fIdx, !vis);
     });
+
+    // Live mode: pulsing "WORKING" ring around active agents
+    if(liveMode){
+      liveAgents.forEach(agName=>{
+        const ag=agents.find(a=>a.name===agName);
+        if(!ag) return;
+        const color=CATS[ag.cat]?.color||'#00ff9d';
+        const h=ag.isWalker?CH:8*S;
+        const pulse=(Math.sin(tick*0.12)+1)/2;
+        // Outer glow ring
+        ctx.strokeStyle=color;
+        ctx.lineWidth=2;
+        ctx.globalAlpha=0.4+pulse*0.6;
+        ctx.shadowBlur=10+pulse*14;
+        ctx.shadowColor=color;
+        ctx.strokeRect(ag.x-4,ag.y-4,CW+8,h+8);
+        ctx.shadowBlur=0;
+        ctx.globalAlpha=1;
+        // WORKING badge
+        const badge='▶ WORKING';
+        const bw=badge.length*5+8;
+        ctx.globalAlpha=0.92;
+        ctx.fillStyle='rgba(8,5,16,0.88)';
+        ctx.fillRect(ag.x-2,ag.y-16,bw,13);
+        ctx.globalAlpha=1;
+        ctx.fillStyle=color;
+        ctx.font='bold 6px monospace';
+        ctx.textBaseline='middle';
+        ctx.fillText(badge,ag.x+2,ag.y-10);
+        // Spark particles
+        for(let i=0;i<3;i++){
+          const angle=((tick*0.08)+i*(Math.PI*2/3));
+          const r=CW*0.8;
+          const px=ag.x+CW/2+Math.cos(angle)*r;
+          const py=ag.y+h/2+Math.sin(angle)*r*0.5;
+          ctx.globalAlpha=0.6+pulse*0.4;
+          ctx.fillStyle=color;
+          ctx.fillRect(px,py,2,2);
+        }
+        ctx.globalAlpha=1;
+      });
+    }
 
     // Hover tooltip (when not selected)
     if(hovered && hovered!==selected){
@@ -819,6 +881,7 @@ const OFFICE=(()=>{
 
       canvas.addEventListener('click',onCanvasClick);
       canvas.addEventListener('mousemove',onCanvasHover);
+      pollActive();
 
       // Search
       $('search').addEventListener('input',e=>{ filterQuery=e.target.value.trim(); });
